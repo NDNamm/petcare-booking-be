@@ -1,4 +1,4 @@
-package com.example.pet_care_booking.entity;
+package com.example.pet_care_booking.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "roles")
-public class RoleEntity {
+public class Role {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long id;
@@ -23,6 +23,6 @@ public class RoleEntity {
 
    @OneToMany(mappedBy = "role")
    @JsonIgnore
-   private List<UserEntity> user;
+   private List<User> user;
 
 }
