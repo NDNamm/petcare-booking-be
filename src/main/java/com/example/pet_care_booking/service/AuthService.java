@@ -1,4 +1,4 @@
-package com.example.pet_care_booking.Service;
+package com.example.pet_care_booking.service;
 
 import com.example.pet_care_booking.dto.request.LoginRequest;
 import com.example.pet_care_booking.dto.request.RegisterRequest;

@@ -1,4 +1,4 @@
-package com.example.pet_care_booking.model;
+package com.example.pet_care_booking.modal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

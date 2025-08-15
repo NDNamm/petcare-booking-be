@@ -1,6 +1,6 @@
 package com.example.pet_care_booking.controller;
 
-import com.example.pet_care_booking.Service.AuthService;
+import com.example.pet_care_booking.service.AuthService;
 import com.example.pet_care_booking.dto.request.LoginRequest;
 import com.example.pet_care_booking.dto.request.RegisterRequest;
 import com.example.pet_care_booking.dto.response.ApiResponse;

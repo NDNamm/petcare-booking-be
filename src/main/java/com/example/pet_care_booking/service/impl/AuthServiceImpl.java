@@ -1,12 +1,12 @@
-package com.example.pet_care_booking.Service.Impl;
+package com.example.pet_care_booking.service.impl;
 
-import com.example.pet_care_booking.Service.AuthService;
+import com.example.pet_care_booking.service.AuthService;
 import com.example.pet_care_booking.dto.request.LoginRequest;
 import com.example.pet_care_booking.dto.request.RegisterRequest;
 import com.example.pet_care_booking.dto.response.LoginResponse;
 import com.example.pet_care_booking.dto.response.RegisterResponse;
-import com.example.pet_care_booking.model.Role;
-import com.example.pet_care_booking.model.User;
+import com.example.pet_care_booking.modal.Role;
+import com.example.pet_care_booking.modal.User;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
 import com.example.pet_care_booking.mapper.AuthMapper;

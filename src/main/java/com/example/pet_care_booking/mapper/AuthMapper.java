@@ -1,7 +1,7 @@
 package com.example.pet_care_booking.mapper;
 
 import com.example.pet_care_booking.dto.request.RegisterRequest;
-import com.example.pet_care_booking.model.User;
+import com.example.pet_care_booking.modal.User;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

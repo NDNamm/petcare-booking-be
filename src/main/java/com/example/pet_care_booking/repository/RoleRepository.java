@@ -1,6 +1,6 @@
 package com.example.pet_care_booking.repository;
 
-import com.example.pet_care_booking.model.Role;
+import com.example.pet_care_booking.modal.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

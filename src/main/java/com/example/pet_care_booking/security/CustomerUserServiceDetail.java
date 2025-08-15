@@ -1,6 +1,6 @@
 package com.example.pet_care_booking.security;
 
-import com.example.pet_care_booking.model.User;
+import com.example.pet_care_booking.modal.User;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
 import com.example.pet_care_booking.repository.UserRepository;
