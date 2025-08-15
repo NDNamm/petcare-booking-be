@@ -1,10 +1,12 @@
 package com.example.pet_care_booking.security;
 
+import com.example.pet_care_booking.entity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -45,7 +47,7 @@ public class JwtUtils {
              .compact();
    }
 
-   public Claims parseToken(String token) {
+   private Claims parseToken(String token) {
       return Jwts.parserBuilder()
              .setSigningKey(key)
              .build()
@@ -53,6 +55,9 @@ public class JwtUtils {
              .getBody();
    }
 
+   private Date isExpiration(String token){
+       return parseToken(token).getExpiration();
+   }
    public String extractUsername(String token) {
       return parseToken(token).getSubject();
    }
@@ -62,15 +67,7 @@ public class JwtUtils {
    }
 
    public boolean validateToken(String token, UserDetails userDetails) {
-      try{
-         Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token);
-         return true;
-      }
-      catch (Exception e) {
-         return false;
-      }
+       String username = userDetails.getUsername();
+       return username.equals(extractUsername(token)) && !isExpiration(token).before(new Date());
    }
 }

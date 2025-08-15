@@ -1,17 +1,22 @@
 package com.example.pet_care_booking.mapper;
 
 import com.example.pet_care_booking.dto.request.RegisterRequest;
+import com.example.pet_care_booking.entity.RoleEntity;
 import com.example.pet_care_booking.entity.UserEntity;
-import org.mapstruct.Builder;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = false))
-public interface AuthMapper {
-   @Mapping(target = "id", ignore = true)
-   @Mapping(target = "role", ignore = true)
-   @Mapping(target = "password", ignore = true)
-   @Mapping(target = "createdAt", ignore = true)
-   @Mapping(target = "updatedAt", ignore = true)
-   UserEntity toRegister(RegisterRequest request);
+import java.time.LocalDateTime;
+
+@Component
+public class AuthMapper {
+    public UserEntity toEntity(RegisterRequest registerRequest, RoleEntity role, String encodedPassword) {
+        return UserEntity.builder()
+                .username(registerRequest.getUserName())
+                .role(role)
+                .password(encodedPassword)
+                .createdAt(LocalDateTime.now())
+                .email(registerRequest.getEmail())
+                .phoneNumber(registerRequest.getPhoneNumber())
+                .build();
+    }
 }

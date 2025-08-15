@@ -15,6 +15,7 @@ public enum ErrorCode {
    PHONE_EXISTED(1009, "Phone already exists", HttpStatus.BAD_REQUEST),
    PASSWORD_NOT_MATCH(1002, "Passwords do not match", HttpStatus.BAD_REQUEST),
    USER_NOT_FOUND(1003, "User not found", HttpStatus.NOT_FOUND),
+    USER_NAME_EXIST(1011, "username exist", HttpStatus.BAD_REQUEST),
    USERNAME_INVALID(1004, "Full Name must be at least 5 characters", HttpStatus.BAD_REQUEST),
    PASSWORD_INVALID(1005, "PASSWORD must be at least 8 characters", HttpStatus.BAD_REQUEST),
    PHONE_INVALID(1006, "Phone must be at least 10 characters", HttpStatus.BAD_REQUEST),

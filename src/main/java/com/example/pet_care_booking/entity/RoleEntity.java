@@ -12,9 +12,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
+@Table(name = "roles")
 public class RoleEntity {
-
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long id;

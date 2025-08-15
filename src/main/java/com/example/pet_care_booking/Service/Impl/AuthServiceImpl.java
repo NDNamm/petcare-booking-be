@@ -21,124 +21,116 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
 
-   private final UserRepository userRepository;
-   private final PasswordEncoder passwordEncoder;
-   private final JwtUtils jwtUtils;
-   private final RoleRepository roleRepository;
-   private final AuthMapper authMapper;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
+    private final RoleRepository roleRepository;
+    private final AuthMapper authMapper;
 
-   @Override
-   public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
-      UserEntity user = userRepository.findUserByUserName(loginRequest.getUsername())
-             .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    @Override
+    public LoginResponse login(LoginRequest loginRequest, HttpServletResponse response) {
+        UserEntity user = userRepository.findUserByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-      if(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-         String accessToken = jwtUtils.createAccessToken(user.getUserName(), user.getRole().getName());
-         String refreshToken = jwtUtils.createRefreshToken(user.getUserName());
-         Cookie cookie = new Cookie("refresh_token", refreshToken);
-         cookie.setHttpOnly(true);
-         cookie.setPath("/");
-         cookie.setSecure(true);
-         cookie.setMaxAge(7 * 24 * 60 * 60);
-         response.addCookie(cookie);
+        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            String accessToken = jwtUtils.createAccessToken(user.getUsername(), user.getRole().getName());
+            String refreshToken = jwtUtils.createRefreshToken(user.getUsername());
+            Cookie cookie = new Cookie("refresh_token", refreshToken);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setSecure(true);
+            cookie.setMaxAge(7 * 24 * 60 * 60);
+            response.addCookie(cookie);
 
-         return new LoginResponse(
-                user.getUserName(),
+            return new LoginResponse(
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getPhoneNumber(),
+                    user.getRole().getName(),
+                    accessToken
+            );
+        } else {
+            throw new UsernameNotFoundException("The username or password is incorrect");
+        }
+
+    }
+
+    @Override
+    public void logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refresh_token", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+    }
+
+
+    @Override
+    public RegisterResponse register(RegisterRequest registerRequest) {
+        RoleEntity role = roleRepository.findByName("USER")
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        Optional<UserEntity> existUsername = userRepository.findUserByUsername(registerRequest.getUserName());
+        if (existUsername.isPresent()) throw new AppException(ErrorCode.USER_NAME_EXIST);
+        if (userRepository.findUserByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        if (userRepository.findUserByPhoneNumber(registerRequest.getPhoneNumber()).isPresent()) {
+            throw new AppException(ErrorCode.PHONE_EXISTED);
+        }
+        String encodedPassword = passwordEncoder.encode(registerRequest.getPassword());
+        UserEntity user = authMapper.toEntity(registerRequest, role, encodedPassword);
+        userRepository.save(user);
+        return new RegisterResponse(
+                user.getUsername(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getRole().getName()
+        );
+    }
+
+    @Override
+    public LoginResponse refresh(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        String refreshToken = null;
+        for (Cookie cookie : cookies) {
+            if ("refresh_token".equals(cookie.getName())) {
+                refreshToken = cookie.getValue();
+            }
+        }
+
+        if (refreshToken == null) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        String userName = jwtUtils.extractUsername(refreshToken);
+        UserEntity user = userRepository.findUserByUsername(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        String newAccessToken = jwtUtils.createAccessToken(user.getUsername(), user.getRole().getName());
+
+        return new LoginResponse(
+                user.getUsername(),
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getRole().getName(),
-                accessToken
-         );
-      }
-      else {
-         throw new UsernameNotFoundException("The username or password is incorrect");
-      }
-
-   }
-
-   @Override
-   public void logout(HttpServletResponse response) {
-      Cookie cookie = new Cookie("refresh_token", null);
-      cookie.setHttpOnly(true);
-      cookie.setSecure(true);
-      cookie.setPath("/");
-      cookie.setMaxAge(0);
-
-      response.addCookie(cookie);
-   }
-
-
-   @Override
-   public RegisterResponse register(RegisterRequest registerRequest) {
-      RoleEntity role = roleRepository.findByName("USER")
-             .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
-
-      if (userRepository.findUserByUserName(registerRequest.getUserName()).isPresent()) {
-         throw new AppException(ErrorCode.EMAIL_EXISTED);
-      }
-
-      if (userRepository.findUserByEmail(registerRequest.getEmail()).isPresent()) {
-         throw new AppException(ErrorCode.EMAIL_EXISTED);
-      }
-
-      if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
-         throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
-      }
-
-      if (userRepository.findUserByPhoneNumber(registerRequest.getPhoneNumber()).isPresent()) {
-         throw new AppException(ErrorCode.PHONE_EXISTED);
-      }
-
-      UserEntity user = authMapper.toRegister(registerRequest);
-      user.setPassword(passwordEncoder.encode(user.getPassword()));
-      user.setRole(role);
-      user.setCreatedAt(LocalDateTime.now());
-      user.setUpdatedAt(LocalDateTime.now());
-      userRepository.save(user);
-      return new RegisterResponse(
-             user.getUserName(),
-             user.getEmail(),
-             user.getPhoneNumber(),
-             user.getRole().getName()
-      );
-   }
-
-   @Override
-   public LoginResponse refresh(HttpServletRequest request, HttpServletResponse response) { Cookie[] cookies = request.getCookies();
-      if(cookies == null) {
-         throw new AppException(ErrorCode.UNAUTHORIZED);
-      }
-
-      String refreshToken = null;
-      for (Cookie cookie : cookies) {
-         if("refresh_token".equals(cookie.getName())) {
-            refreshToken = cookie.getValue();
-         }
-      }
-
-      if(refreshToken == null) {
-         throw new AppException(ErrorCode.UNAUTHORIZED);
-      }
-
-      String userName = jwtUtils.extractUsername(refreshToken);
-      UserEntity user = userRepository.findUserByUserName(userName)
-             .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-      String newAccessToken = jwtUtils.createAccessToken(user.getUserName(), user.getRole().getName());
-
-      return new LoginResponse(
-             user.getUserName(),
-             user.getEmail(),
-             user.getPhoneNumber(),
-             user.getRole().getName(),
-             newAccessToken
-      );
-   }
+                newAccessToken
+        );
+    }
 
 }
