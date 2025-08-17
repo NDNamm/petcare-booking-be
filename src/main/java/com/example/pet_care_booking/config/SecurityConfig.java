@@ -1,6 +1,5 @@
 package com.example.pet_care_booking.config;
 
-
 import com.example.pet_care_booking.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,25 +25,31 @@ public class SecurityConfig {
    @Bean
    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
       httpSecurity
-             .cors(withDefaults())
-             .csrf(csrf -> csrf.disable())
-             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-             .authorizeHttpRequests(auth -> auth
-                    // Cho phép login và các API công khai
-                    .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/category/**", "/api/product/**", "/api/rating/**",
-                           "/api/order/history", "/api/orderDetail/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/cart/session/**", "/api/order/**").permitAll()
+            .cors(withDefaults())
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                  // Public APIs
+                  .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**").permitAll()
+                  .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history",
+                        "/api/orderDetail/**")
+                  .permitAll()
+                  .requestMatchers(HttpMethod.POST, "/api/cart/session/**", "/api/order/**").permitAll()
 
-                    // Các quyền cần role
-                    .requestMatchers("/api/rating/**").hasAnyRole("ADMIN", "USER")
-                    .requestMatchers("/api/**").hasRole("ADMIN")
-                    .anyRequest().authenticated()
-             )
-             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                  // Rating GET public, nhưng POST/PUT/DELETE cần login
+                  .requestMatchers(HttpMethod.GET, "/api/rating/**").permitAll()
+                  .requestMatchers("/api/rating/**").hasAnyRole("ADMIN", "USER")
+
+                  // Admin only - more specific rules
+                  .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                  .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")
+
+                  // Any other API requests need authentication
+                  .anyRequest().authenticated())
+
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
       return httpSecurity.build();
    }
-
 
    @Bean
    public PasswordEncoder passwordEncoder() {

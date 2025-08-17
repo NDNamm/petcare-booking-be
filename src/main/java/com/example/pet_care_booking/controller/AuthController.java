@@ -1,11 +1,11 @@
 package com.example.pet_care_booking.controller;
 
+import com.example.pet_care_booking.dto.request.auth.LoginRequest;
+import com.example.pet_care_booking.dto.request.auth.RegisterRequest;
+import com.example.pet_care_booking.dto.response.auth.LoginResponse;
+import com.example.pet_care_booking.dto.response.auth.RegisterResponse;
 import com.example.pet_care_booking.service.AuthService;
-import com.example.pet_care_booking.dto.request.LoginRequest;
-import com.example.pet_care_booking.dto.request.RegisterRequest;
 import com.example.pet_care_booking.dto.response.ApiResponse;
-import com.example.pet_care_booking.dto.response.LoginResponse;
-import com.example.pet_care_booking.dto.response.RegisterResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.pet_care_booking.dto.response;
+package com.example.pet_care_booking.dto.response.auth;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

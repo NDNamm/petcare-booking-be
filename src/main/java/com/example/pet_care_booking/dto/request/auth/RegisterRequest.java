@@ -1,4 +1,4 @@
-package com.example.pet_care_booking.dto.request;
+package com.example.pet_care_booking.dto.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
