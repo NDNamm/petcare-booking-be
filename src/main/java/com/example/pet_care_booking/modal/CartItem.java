@@ -20,7 +20,7 @@ public class CartItem {
    private Long id;
 
    @Column(name = "quantity")
-   private int quantity;
+   private Long quantity;
 
    @Column(name = "price")
    private BigDecimal price;
@@ -33,8 +33,14 @@ public class CartItem {
    @JoinColumn(name = "product_id")
    private Product product;
 
-   @ManyToOne
+   @ManyToOne(fetch = FetchType.LAZY)
    @JsonIgnore
-   @JoinColumn(name = "cart_id")
+   @JoinColumn(name = "cart_id", nullable = false)
    private Cart cart;
+
+   public void updateQuantityAndPrice(long quantity, BigDecimal price) {
+      this.quantity = quantity;
+      this.price = price;
+      this.totalPrice = price.multiply(BigDecimal.valueOf(quantity));
+   }
 }

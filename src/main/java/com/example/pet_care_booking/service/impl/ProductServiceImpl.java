@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
              .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
       productRepository.findByNamePro(dto.getNamePro())
-             .filter(pro -> pro.getId() != id)
+             .filter(pro -> !pro.getId().equals(id))
              .ifPresent(pro -> {
                 throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
              });

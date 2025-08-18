@@ -66,7 +66,7 @@ public class CategoriesServiceImpl implements CategoriesService {
              .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
       categoriesRepository.findByNameCate(categories.getNameCate())
-             .filter(cate -> cate.getId() != id)
+             .filter(cate -> !cate.getId().equals(id))
              .ifPresent(cate -> {
                 throw new AppException(ErrorCode.CATEGORY_NAME_EXISTED);
              });
