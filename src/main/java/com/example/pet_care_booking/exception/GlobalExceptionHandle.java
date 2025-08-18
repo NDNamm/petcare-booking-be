@@ -1,6 +1,6 @@
 package com.example.pet_care_booking.exception;
 
-import com.example.pet_care_booking.dto.response.ApiResponse;
+import com.example.pet_care_booking.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;

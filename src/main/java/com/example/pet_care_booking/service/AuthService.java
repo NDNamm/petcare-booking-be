@@ -1,15 +1,13 @@
 package com.example.pet_care_booking.service;
 
-import com.example.pet_care_booking.dto.request.auth.LoginRequest;
-import com.example.pet_care_booking.dto.request.auth.RegisterRequest;
-import com.example.pet_care_booking.dto.response.auth.LoginResponse;
-import com.example.pet_care_booking.dto.response.auth.RegisterResponse;
+import com.example.pet_care_booking.dto.AuthDTO;
+import com.example.pet_care_booking.dto.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
-   LoginResponse login(LoginRequest loginRequest, HttpServletResponse response);
+   AuthDTO login(UserDTO dto, HttpServletResponse response);
    void logout(HttpServletResponse response);
-   RegisterResponse register(RegisterRequest registerRequest);
-   LoginResponse refresh(HttpServletRequest request, HttpServletResponse response);
+   void register(UserDTO dto);
+   AuthDTO refresh(HttpServletRequest request, HttpServletResponse response);
 }

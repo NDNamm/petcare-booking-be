@@ -40,6 +40,7 @@ public class User {
     @JsonIgnore
     @JoinColumn(name = "role_id")
     private Role role;
+
 //
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,4 +1,4 @@
-package com.example.pet_care_booking.dto.response;
+package com.example.pet_care_booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -13,5 +13,4 @@ public class ApiResponse<T> {
    private int code = 200;
    private String message = "success";
    private T data;
-
 }

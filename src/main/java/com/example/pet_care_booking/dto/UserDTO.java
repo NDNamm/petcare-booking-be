@@ -1,36 +1,43 @@
-package com.example.pet_care_booking.dto.request.auth;
+package com.example.pet_care_booking.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
-@Data
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class RegisterRequest {
-
-   @NotBlank(message = "USERNAME_INVALID")
-   @Size(min = 5, max = 50, message = "USERNAME_INVALID")
-   String userName;
-
-   @NotBlank(message = "PHONE_INVALID")
-   @Size(min = 10, max = 15, message = "PHONE_INVALID")
-   String phoneNumber;
+public class UserDTO {
+   private Long id;
 
    @NotBlank(message = "EMAIL_EXISTED")
    @Size(min = 5, max = 100, message = "EMAIL_EXISTED")
-   String email;
+   private String email;
+
+   @NotBlank(message = "USERNAME_INVALID")
+   @Size(min = 5, max = 50, message = "USERNAME_INVALID")
+   private String userName;
+
+   @NotBlank(message = "PHONE_INVALID")
+   @Size(min = 10, max = 15, message = "PHONE_INVALID")
+   private String phoneNumber;
+
+   private LocalDate dob;
 
    @NotBlank(message = "PASSWORD_INVALID")
    @Size(min = 8, max = 20, message = "PASSWORD_INVALID")
-   String password;
+   private String password;
 
    @NotBlank(message = "PASSWORD_INVALID")
    @Size(min = 8, max = 20, message = "PASSWORD_INVALID")
-   String confirmPassword;
+   private String confirmPassword;
+
+   private LocalDateTime createdAt;
+   private LocalDateTime updatedAt;
+   private String roleName;
 }

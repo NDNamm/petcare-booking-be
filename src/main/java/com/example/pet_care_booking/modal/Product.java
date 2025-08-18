@@ -57,15 +57,15 @@ public class Product {
 //
    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    private List<Images> images;
+
+   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @JsonIgnore
+   private List<CartItem> cartItems;
 //
 //   @OneToMany(mappedBy = "product")
 //   @JsonIgnore
 //   private List<Rating> rating;
 //
-//   @OneToMany(mappedBy = "product")
-//   @JsonIgnore
-//   private List<CartItems> cartItem;
-
 
 }
 

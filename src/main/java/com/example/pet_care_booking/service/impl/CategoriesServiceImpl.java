@@ -1,10 +1,8 @@
 package com.example.pet_care_booking.service.impl;
 
-import com.example.pet_care_booking.dto.request.category.CategoriesRequest;
-import com.example.pet_care_booking.dto.response.category.CategoriesResponse;
+import com.example.pet_care_booking.dto.CategoriesDTO;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
-import com.example.pet_care_booking.mapper.CategoriesMapper;
 import com.example.pet_care_booking.modal.Categories;
 import com.example.pet_care_booking.repository.CategoriesRepository;
 import com.example.pet_care_booking.service.CategoriesService;
@@ -26,61 +24,64 @@ public class CategoriesServiceImpl implements CategoriesService {
 
    private final CategoriesRepository categoriesRepository;
    private final ImageService imageService;
-   private final CategoriesMapper categoriesMapper;
 
    @Override
-   public Page<CategoriesResponse> getAllCate(int page, int size) {
+   public Page<CategoriesDTO> getAllCate(String name, int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-      Page<Categories> pageCate = categoriesRepository.findAll(pageable);
+      Page<Categories> pageCate;
+      if (name == null) {
+         pageCate = categoriesRepository.findAll(pageable);
+      } else {
+         pageCate = categoriesRepository.findByNameCateContainingIgnoreCase(name, pageable);
+      }
 
       return getCategoryResponse(pageCate);
    }
 
    @Override
-   public CategoriesResponse addCate(CategoriesRequest categoriesRequest, MultipartFile image) {
-      boolean categories = categoriesRepository.existsByNameCate(categoriesRequest.getNameCate());
+   public CategoriesDTO addCate(CategoriesDTO categoriesDTO, MultipartFile image) {
+      boolean categories = categoriesRepository.existsByNameCate(categoriesDTO.getNameCate());
       if (categories) {
          throw new AppException(ErrorCode.CATEGORY_NAME_EXISTED);
       }
       try {
-         Categories category = categoriesMapper.addCategory(categoriesRequest);
-         category.setImageUrl(imageService.uploadCate(image));
-         category.setCreatedAt(LocalDateTime.now());
-         category.setUpdatedAt(LocalDateTime.now());
+         Categories category = Categories.builder()
+                .nameCate(categoriesDTO.getNameCate())
+                .imageUrl(imageService.uploadCate(image))
+                .description(categoriesDTO.getDescription())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+         Categories saved = categoriesRepository.save(category);
 
-         // Save and get the saved entity with generated ID
-         Categories savedCategory = categoriesRepository.save(category);
-
-         return categoriesMapper.toCategories(savedCategory);
+         return convertToDTO(saved);
       } catch (IOException e) {
          throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
       }
    }
 
    @Override
-   public CategoriesResponse updateCate(Long id, CategoriesRequest categoriesRequest, MultipartFile image) {
+   public CategoriesDTO updateCate(Long id, CategoriesDTO categoriesDTO, MultipartFile image) {
       Categories categories = categoriesRepository.findById(id)
-            .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+             .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-      categoriesRepository.findByNameCate(categoriesRequest.getNameCate())
-            .filter(cate -> cate.getId() != id)
-            .ifPresent(cate -> {
-               throw new AppException(ErrorCode.CATEGORY_NAME_EXISTED);
-            });
+      categoriesRepository.findByNameCate(categories.getNameCate())
+             .filter(cate -> cate.getId() != id)
+             .ifPresent(cate -> {
+                throw new AppException(ErrorCode.CATEGORY_NAME_EXISTED);
+             });
 
       try {
-         categories = categoriesMapper.updateCategory(categories, categoriesRequest);
-
          if (image != null && !image.isEmpty()) {
             String url = imageService.uploadCate(image);
             categories.setImageUrl(url);
          }
+         categories.setNameCate(categoriesDTO.getNameCate());
+         categories.setDescription(categoriesDTO.getDescription());
+         categories.setUpdatedAt(LocalDateTime.now());
+         Categories saved = categoriesRepository.save(categories);
 
-         // Save and get the updated entity
-         Categories updatedCategory = categoriesRepository.save(categories);
-
-         return categoriesMapper.toCategories(updatedCategory);
-
+         return convertToDTO(saved);
       } catch (IOException e) {
          throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
       }
@@ -90,30 +91,30 @@ public class CategoriesServiceImpl implements CategoriesService {
    @Override
    public void deleteCate(Long id) {
       Categories categories = categoriesRepository.findById(id)
-            .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+             .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
       categoriesRepository.delete(categories);
    }
 
-   @Override
-   public Page<CategoriesResponse> selectCategoryByName(String cateName, int page, int size) {
-      Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-      Page<Categories> pageCate = categoriesRepository.searchCategoriesByName(cateName, pageable);
-      if (pageCate.isEmpty()) {
-         throw new AppException(ErrorCode.CATEGORY_NOT_FOUND);
-      }
-
-      return getCategoryResponse(pageCate);
+   private Page<CategoriesDTO> getCategoryResponse(Page<Categories> categories) {
+      return categories.map(cate -> CategoriesDTO.builder()
+             .id(cate.getId())
+             .nameCate(cate.getNameCate())
+             .imageUrl(cate.getImageUrl())
+             .description(cate.getDescription())
+             .createdAt(cate.getCreatedAt())
+             .updatedAt(cate.getUpdatedAt())
+             .build());
    }
 
-   private Page<CategoriesResponse> getCategoryResponse(Page<Categories> categories) {
-      return categories.map(cate -> CategoriesResponse.builder()
-            .id(cate.getId())
-            .nameCate(cate.getNameCate())
-            .imageUrl(cate.getImageUrl())
-            .description(cate.getDescription())
-            .createdAt(cate.getCreatedAt())
-            .updatedAt(cate.getUpdatedAt())
-            .build());
+   private CategoriesDTO convertToDTO(Categories categories) {
+      return CategoriesDTO.builder()
+             .id(categories.getId())
+             .nameCate(categories.getNameCate())
+             .imageUrl(categories.getImageUrl())
+             .description(categories.getDescription())
+             .createdAt(categories.getCreatedAt())
+             .updatedAt(categories.getUpdatedAt())
+             .build();
    }
 }

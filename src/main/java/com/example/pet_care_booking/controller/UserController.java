@@ -1,9 +1,7 @@
 package com.example.pet_care_booking.controller;
 
-import com.example.pet_care_booking.dto.request.user.UserCreateRequest;
-import com.example.pet_care_booking.dto.request.user.UserUpdateRequest;
-import com.example.pet_care_booking.dto.response.ApiResponse;
-import com.example.pet_care_booking.dto.response.user.UserResponse;
+import com.example.pet_care_booking.dto.ApiResponse;
+import com.example.pet_care_booking.dto.UserDTO;
 import com.example.pet_care_booking.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,25 +17,27 @@ public class UserController {
 
 
    @GetMapping("")
-   ApiResponse<Page<UserResponse>> getAllUsers(@RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "5") int size) {
-      ApiResponse<Page<UserResponse>> apiResponse = new ApiResponse<>();
+   public ApiResponse<Page<UserDTO>> getAllUsers(@RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "5") int size) {
+      ApiResponse<Page<UserDTO>> apiResponse = new ApiResponse<>();
       apiResponse.setData(userService.getAllUsers(page, size));
       return apiResponse;
    }
 
    @PostMapping("/create")
-   ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreateRequest userRequest) {
-      ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-      apiResponse.setData(userService.addUser(userRequest));
+   public ApiResponse<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
+      ApiResponse<UserDTO> apiResponse = new ApiResponse<>();
+      userService.addUser(userDTO);
+      apiResponse.setMessage("Successfully created user");
       return apiResponse;
    }
 
    @PutMapping("/update/{userId}")
-   ApiResponse<UserResponse> updateUser(@PathVariable Long userId,
-                                        @Valid  @RequestBody UserUpdateRequest userUpdateRequest) {
-      ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-      apiResponse.setData(userService.updateUser(userId,userUpdateRequest));
+   public ApiResponse<UserDTO> updateUser(@PathVariable Long userId,
+                                        @Valid  @RequestBody UserDTO updateUserDTO) {
+      ApiResponse<UserDTO> apiResponse = new ApiResponse<>();
+      userService.updateUser(userId,updateUserDTO);
+      apiResponse.setMessage("Update user thành cong");
       return apiResponse;
    }
 }

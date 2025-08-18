@@ -1,8 +1,7 @@
 package com.example.pet_care_booking.controller;
 
-import com.example.pet_care_booking.dto.request.category.CategoriesRequest;
-import com.example.pet_care_booking.dto.response.ApiResponse;
-import com.example.pet_care_booking.dto.response.category.CategoriesResponse;
+import com.example.pet_care_booking.dto.ApiResponse;
+import com.example.pet_care_booking.dto.CategoriesDTO;
 import com.example.pet_care_booking.service.CategoriesService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,22 +19,23 @@ public class CategoriesController {
    private final CategoriesService categoriesService;
 
    @GetMapping("")
-   public ApiResponse<Page<CategoriesResponse>> getAllCategory(@RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "5") int size) {
+   public ApiResponse<Page<CategoriesDTO>> getAllCategory(@RequestParam String name,
+                                                          @RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "5") int size) {
 
-      ApiResponse<Page<CategoriesResponse>> response = new ApiResponse<>();
-      response.setData(categoriesService.getAllCate(page, size));
+      ApiResponse<Page<CategoriesDTO>> response = new ApiResponse<>();
+      response.setData(categoriesService.getAllCate(name, page, size));
       return response;
    }
 
    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-   public ApiResponse<CategoriesResponse> addCategory(@RequestPart("categoryRequest") String categoriesJson,
-                                                      @RequestPart("image") MultipartFile image) {
-      ApiResponse<CategoriesResponse> response = new ApiResponse<>();
+   public ApiResponse<CategoriesDTO> addCategory(@RequestPart("categoriesDTO") String categoriesJson,
+                                                 @RequestPart("image") MultipartFile image) {
+      ApiResponse<CategoriesDTO> response = new ApiResponse<>();
       try {
 
          ObjectMapper mapper = new ObjectMapper();
-         CategoriesRequest request = mapper.readValue(categoriesJson, CategoriesRequest.class);
+         CategoriesDTO request = mapper.readValue(categoriesJson, CategoriesDTO.class);
 
          response.setData(categoriesService.addCate(request, image));
          response.setMessage("Thêm category thành công");
@@ -48,14 +48,13 @@ public class CategoriesController {
    }
 
    @PutMapping("/update/{id}")
-   public ApiResponse<CategoriesResponse> updateCategory(@PathVariable Long id,
-                                                         @RequestPart("categoryRequest") String categoriesJson,
-                                                         @RequestPart(value = "image", required = false) MultipartFile image) {
-      ApiResponse<CategoriesResponse> response = new ApiResponse<>();
+   public ApiResponse<CategoriesDTO> updateCategory(@PathVariable Long id,
+                                                    @RequestPart("categoryDTO") String categoriesJson,
+                                                    @RequestPart(value = "image", required = false) MultipartFile image) {
+      ApiResponse<CategoriesDTO> response = new ApiResponse<>();
       try {
          ObjectMapper mapper = new ObjectMapper();
-         CategoriesRequest request = mapper.readValue(categoriesJson, CategoriesRequest.class);
-
+         CategoriesDTO request = mapper.readValue(categoriesJson, CategoriesDTO.class);
          response.setData(categoriesService.updateCate(id, request, image));
          response.setMessage("Update category thành công");
          return response;
@@ -67,21 +66,12 @@ public class CategoriesController {
    }
 
    @DeleteMapping("/delete/{id}")
-   public ApiResponse<CategoriesResponse> deleteCategory(@PathVariable Long id) {
+   public ApiResponse<CategoriesDTO> deleteCategory(@PathVariable Long id) {
 
-      ApiResponse<CategoriesResponse> response = new ApiResponse<>();
+      ApiResponse<CategoriesDTO> response = new ApiResponse<>();
       categoriesService.deleteCate(id);
       response.setMessage("Delete category thành công");
       return response;
    }
 
-   @GetMapping("/search/{name}")
-   public ApiResponse<Page<CategoriesResponse>> selectCategory(@PathVariable String name,
-                                                          @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "5") int size) {
-
-      ApiResponse<Page<CategoriesResponse>> response = new ApiResponse<>();
-      response.setData(categoriesService.selectCategoryByName(name, page, size));
-      return response;
-   }
 }

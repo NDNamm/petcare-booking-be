@@ -1,11 +1,9 @@
 package com.example.pet_care_booking.controller;
 
-import com.example.pet_care_booking.dto.request.auth.LoginRequest;
-import com.example.pet_care_booking.dto.request.auth.RegisterRequest;
-import com.example.pet_care_booking.dto.response.auth.LoginResponse;
-import com.example.pet_care_booking.dto.response.auth.RegisterResponse;
+import com.example.pet_care_booking.dto.ApiResponse;
+import com.example.pet_care_booking.dto.AuthDTO;
+import com.example.pet_care_booking.dto.UserDTO;
 import com.example.pet_care_booking.service.AuthService;
-import com.example.pet_care_booking.dto.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +20,17 @@ public class AuthController {
    private final AuthService authService;
 
    @PostMapping("/login")
-   public ApiResponse<LoginResponse> login(@RequestBody LoginRequest user,
-                                           HttpServletResponse res) {
-      ApiResponse<LoginResponse> response = new ApiResponse<>();
+   public ApiResponse<AuthDTO> login(@RequestBody UserDTO user,
+                                     HttpServletResponse res) {
+      ApiResponse<AuthDTO> response = new ApiResponse<>();
       response.setData(authService.login(user, res));
       return response;
    }
 
    @PostMapping("/register")
-   public ApiResponse<RegisterResponse> register(@RequestBody RegisterRequest user) {
-      ApiResponse<RegisterResponse> response = new ApiResponse<>();
-      response.setData(authService.register(user));
+   public ApiResponse<Void> register(@RequestBody UserDTO user) {
+      ApiResponse<Void> response = new ApiResponse<>();
+      authService.register(user);
       response.setMessage("Đăng kí tài khoản thành công");
       return response;
    }
@@ -46,8 +44,8 @@ public class AuthController {
    }
 
    @PostMapping("/refresh-token")
-   public ApiResponse<LoginResponse> refresh(HttpServletRequest req, HttpServletResponse res) {
-      ApiResponse<LoginResponse> response = new ApiResponse<>();
+   public ApiResponse<AuthDTO> refresh(HttpServletRequest req, HttpServletResponse res) {
+      ApiResponse<AuthDTO> response = new ApiResponse<>();
       response.setData(authService.refresh(req, res));
       return response;
    }

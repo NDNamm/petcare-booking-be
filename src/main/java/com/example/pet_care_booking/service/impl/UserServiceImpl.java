@@ -1,11 +1,8 @@
 package com.example.pet_care_booking.service.impl;
 
-import com.example.pet_care_booking.dto.request.user.UserCreateRequest;
-import com.example.pet_care_booking.dto.request.user.UserUpdateRequest;
-import com.example.pet_care_booking.dto.response.user.UserResponse;
+import com.example.pet_care_booking.dto.UserDTO;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
-import com.example.pet_care_booking.mapper.UserMapper;
 import com.example.pet_care_booking.modal.Role;
 import com.example.pet_care_booking.modal.User;
 import com.example.pet_care_booking.repository.RoleRepository;
@@ -28,14 +25,13 @@ public class UserServiceImpl implements UserService {
    private final UserRepository userRepository;
    private final RoleRepository roleRepository;
    private final PasswordEncoder passwordEncoder;
-   private final UserMapper userMapper;
 
    @Override
-   public Page<UserResponse> getAllUsers(int page, int size) {
+   public Page<UserDTO> getAllUsers(int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
       Page<User> users = userRepository.findAll(pageable);
 
-      return users.map(user -> UserResponse.builder()
+      return users.map(user -> UserDTO.builder()
              .id(user.getId())
              .userName(user.getUserName())
              .email(user.getEmail())
@@ -43,45 +39,54 @@ public class UserServiceImpl implements UserService {
              .password(user.getPassword())
              .createdAt(user.getCreatedAt())
              .updatedAt(user.getUpdatedAt())
-             .nameRole(user.getRole().getName())
+             .roleName(user.getRole().getName())
              .build());
    }
 
    @Override
-   public UserResponse addUser(UserCreateRequest userCreateRequest) {
+   public void addUser(UserDTO userDTO) {
       Role role = roleRepository.findByName("USER")
              .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
-      Optional<User> existUsername = userRepository.findUserByUserName(userCreateRequest.getUserName());
+      Optional<User> existUsername = userRepository.findUserByUserName(userDTO.getUserName());
       if (existUsername.isPresent()) throw new AppException(ErrorCode.USER_NAME_EXIST);
-      if (userRepository.findUserByEmail(userCreateRequest.getEmail()).isPresent()) {
+      if (userRepository.findUserByEmail(userDTO.getEmail()).isPresent()) {
          throw new AppException(ErrorCode.EMAIL_EXISTED);
       }
 
-      if (!userCreateRequest.getPassword().equals(userCreateRequest.getConfirmPassword())) {
+      if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
          throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
       }
-      if (userRepository.findUserByPhoneNumber(userCreateRequest.getPhoneNumber()).isPresent()) {
+      if (userRepository.findUserByPhoneNumber(userDTO.getPhoneNumber()).isPresent()) {
          throw new AppException(ErrorCode.PHONE_EXISTED);
       }
-      String encodedPassword = passwordEncoder.encode(userCreateRequest.getPassword());
-      User user = userMapper.toCreateUser(userCreateRequest);
-      user.setPassword(encodedPassword);
-      user.setRole(role);
-      user.setCreatedAt(LocalDateTime.now());
-      user.setUpdatedAt(LocalDateTime.now());
+      User user = User.builder()
+             .email(userDTO.getEmail())
+             .password(passwordEncoder.encode(userDTO.getPassword()))
+             .userName(userDTO.getUserName())
+             .phoneNumber(userDTO.getPhoneNumber())
+             .createdAt(LocalDateTime.now())
+             .updatedAt(LocalDateTime.now())
+             .role(role)
+             .build();
       userRepository.save(user);
-
-      return userMapper.toUserResponse(user);
    }
 
    @Override
-   public UserResponse updateUser(Long id,UserUpdateRequest userUpdateRequest) {
+   public void updateUser( Long id, UserDTO userDTO) {
       User user = userRepository.findById(id)
              .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-      user = userMapper.toUpdateUser(user, userUpdateRequest);
+      if(userRepository.findUserByPhoneNumber(userDTO.getPhoneNumber()).isPresent()) {
+         throw new AppException(ErrorCode.PHONE_EXISTED);
+      }
+
+      if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
+         throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+      }
+      user.setPhoneNumber(userDTO.getPhoneNumber());
+      user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+      user.setUpdatedAt(LocalDateTime.now());
       userRepository.save(user);
-      return userMapper.toUserResponse(user);
    }
 
    @Override
@@ -93,7 +98,7 @@ public class UserServiceImpl implements UserService {
    }
 
    @Override
-   public Page<UserResponse> getUser(String key, int page, int size) {
+   public Page<UserDTO> getUser(String key, int page, int size) {
       return null;
    }
 }
