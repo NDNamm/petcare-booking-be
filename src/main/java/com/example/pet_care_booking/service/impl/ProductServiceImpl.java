@@ -29,82 +29,103 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-   private final ProductRepository productRepository;
-   private final ImageService imageService;
-   private final CategoriesRepository categoriesRepository;
+    private final ProductRepository productRepository;
+    private final ImageService imageService;
+    private final CategoriesRepository categoriesRepository;
 
-   @Override
-   public Page<ProductDTO> getAllProducts(String name, int page, int size) {
-      Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-      Page<Product> products;
+    @Override
+    public Page<ProductDTO> getAllProducts(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Product> products;
 
-      if (name == null || name.trim().isEmpty()) {
-         products = productRepository.findAll(pageable);
-      } else {
-         products = productRepository.findByNameProContainingIgnoreCase(name, pageable);
-      }
+        if (name == null || name.trim().isEmpty()) {
+            products = productRepository.findAll(pageable);
+        } else {
+            products = productRepository.findByNameProContainingIgnoreCase(name, pageable);
+        }
 
-      return getProduct(products);
-   }
+        return getProduct(products);
+    }
 
-   @Override
-   public ProductDTO addProduct(Long id, ProductDTO dto, MultipartFile[] image) {
-      if (productRepository.existsByNamePro(dto.getNamePro())) {
-         throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
-      }
+    @Override
+    public ProductDTO addProduct(Long id, ProductDTO dto, MultipartFile[] image) {
+        if (productRepository.existsByNamePro(dto.getNamePro())) {
+            throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
+        }
 
-      Categories categories = categoriesRepository.findById(id)
-             .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-      try {
+        Categories categories = categoriesRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        try {
 
-         Product product = Product.builder()
-                .namePro(dto.getNamePro())
-                .description(dto.getDescription())
-                .price(dto.getPrice())
-                .status(ProductStatus.AVAILABLE)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .category(categories)
-                .build();
-         productRepository.save(product);
+            Product product = Product.builder()
+                    .namePro(dto.getNamePro())
+                    .description(dto.getDescription())
+                    .price(dto.getPrice())
+                    .status(ProductStatus.AVAILABLE)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .category(categories)
+                    .build();
+            productRepository.save(product);
 
-         List<Images> images = imageService.uploadProduct(image, dto.getNamePro(), product);
-         String imageUrl = images.get(0).getImageUrl();
+            List<Images> images = imageService.uploadProduct(image, dto.getNamePro(), product);
+            String imageUrl = images.get(0).getImageUrl();
 
-         product.setImageUrl(imageUrl);
-         product.setImages(images);
-         Product product1 = productRepository.save(product);
+            product.setImageUrl(imageUrl);
+            product.setImages(images);
+            Product product1 = productRepository.save(product);
 
-         return convertProduct(product1);
-      } catch (IOException e) {
-         throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
-      }
+            return convertProduct(product1);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
+        }
 
-   }
+    }
 
-   @Override
-   public ProductDTO updateProduct(Long id, ProductDTO dto, MultipartFile[] image) {
+    @Override
+    public ProductDTO updateProduct(Long id, ProductDTO dto, MultipartFile[] image) {
 
-      Product product = productRepository.findById(id)
-             .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-      productRepository.findByNamePro(dto.getNamePro())
-             .filter(pro -> !pro.getId().equals(id))
-             .ifPresent(pro -> {
-                throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
-             });
+        productRepository.findByNamePro(dto.getNamePro())
+                .filter(pro -> !pro.getId().equals(id))
+                .ifPresent(pro -> {
+                    throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
+                });
 
-      try {
-         product.setNamePro(dto.getNamePro());
-         product.setPrice(dto.getPrice());
-         product.setDescription(dto.getDescription());
-         product.setUpdatedAt(LocalDateTime.now());
-         if (dto.getStatus() != null) {
-            product.setStatus(dto.getStatus());
-         }
-         // Nếu có ảnh mới thì mới xóa ảnh cũ và upload ảnh mới
-         if (image != null && image.length > 0) {
+        try {
+            product.setNamePro(dto.getNamePro());
+            product.setPrice(dto.getPrice());
+            product.setDescription(dto.getDescription());
+            product.setUpdatedAt(LocalDateTime.now());
+            if (dto.getStatus() != null) {
+                product.setStatus(dto.getStatus());
+            }
+            // Nếu có ảnh mới thì mới xóa ảnh cũ và upload ảnh mới
+            if (image != null && image.length > 0) {
+                imageService.deleteOldImages(product);
+                // Upload ảnh mới
+                List<Images> newImages = imageService.uploadProduct(image, dto.getNamePro(), product);
+                product.setImages(newImages);
+                product.setImageUrl(newImages.get(0).getImageUrl());
+            }
+            Product product1 = productRepository.save(product);
+
+            return convertProduct(product1);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
+        }
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        try {
             imageService.deleteOldImages(product);
+<<<<<<< HEAD
             // Upload ảnh mới
             List<Images> newImages = imageService.uploadProduct(image, dto.getNamePro(), product);
             product.getImages().clear();
@@ -112,88 +133,76 @@ public class ProductServiceImpl implements ProductService {
             product.setImageUrl(newImages.get(0).getImageUrl());
          }
          Product product1 = productRepository.save(product);
+=======
+            productRepository.delete(product);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.DELETE_IMAGE_FAIL);
+        }
+>>>>>>> 2f69abd9f729e53be1c1d79716dd87cf8f67acfe
 
-         return convertProduct(product1);
-      } catch (IOException e) {
-         throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
-      }
-   }
+    }
 
-   @Override
-   public void deleteProduct(Long id) {
+    @Override
+    public Page<ProductDTO> searchProductByCateId(Long cateId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Product> products = productRepository.findProductsByCategoryId(cateId, pageable);
 
-      Product product = productRepository.findById(id)
-             .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-      try {
-         imageService.deleteOldImages(product);
-         productRepository.delete(product);
-      } catch (IOException e) {
-         throw new AppException(ErrorCode.DELETE_IMAGE_FAIL);
-      }
+        return getProduct(products);
+    }
 
-   }
+    @Override
+    public ProductDTO getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-   @Override
-   public Page<ProductDTO> searchProductByCateId(Long cateId, int page, int size) {
-      Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-      Page<Product> products = productRepository.findProductsByCategoryId(cateId, pageable);
+        return convertProduct(product);
+    }
 
-      return getProduct(products);
-   }
+    private Page<ProductDTO> getProduct(Page<Product> products) {
+        return products.map(product -> {
+            List<ImagesDTO> imageDTOs = toImageDTOs(product.getImages());
 
-   @Override
-   public ProductDTO getProductById(Long id) {
-      Product product = productRepository.findById(id)
-             .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+            return ProductDTO.builder()
+                    .id(product.getId())
+                    .namePro(product.getNamePro())
+                    .price(product.getPrice())
+                    .description(product.getDescription())
+                    .status(product.getStatus())
+                    .averageRating(product.getAverageRating())
+                    .createdAt(product.getCreatedAt().toString())
+                    .updatedAt(product.getUpdatedAt().toString())
+                    .imageUrl(imageDTOs.stream().findFirst().map(ImagesDTO::getImageUrl).orElse(null))
+                    .imagesDTO(imageDTOs)
+                    .categoryId(product.getCategory().getId())
+                    .build();
+        });
+    }
 
-      return convertProduct(product);
-   }
+    private List<ImagesDTO> toImageDTOs(List<Images> images) {
+        return Optional.ofNullable(images).orElse(List.of())
+                .stream()
+                .map(img -> ImagesDTO.builder()
+                        .id(img.getId())
+                        .publicId(img.getPublicId())
+                        .imageUrl(img.getImageUrl())
+                        .size(img.getSize())
+                        .build())
+                .toList();
+    }
 
-   private Page<ProductDTO> getProduct(Page<Product> products) {
-      return products.map(product -> {
-         List<ImagesDTO> imageDTOs = toImageDTOs(product.getImages());
-
-         return ProductDTO.builder()
+    private ProductDTO convertProduct(Product product) {
+        List<ImagesDTO> imageDTOs = toImageDTOs(product.getImages());
+        return ProductDTO.builder()
                 .id(product.getId())
                 .namePro(product.getNamePro())
+                .imageUrl(product.getImageUrl())
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .status(product.getStatus())
                 .averageRating(product.getAverageRating())
-                .createdAt(product.getCreatedAt())
-                .updatedAt(product.getUpdatedAt())
-                .imageUrl(imageDTOs.stream().findFirst().map(ImagesDTO::getImageUrl).orElse(null))
+                .createdAt(product.getCreatedAt().toString())
+                .updatedAt(product.getUpdatedAt().toString())
                 .imagesDTO(imageDTOs)
-                .categoryId(product.getCategory().getId())
                 .build();
-      });
-   }
-
-   private List<ImagesDTO> toImageDTOs(List<Images> images) {
-      return Optional.ofNullable(images).orElse(List.of())
-             .stream()
-             .map(img -> ImagesDTO.builder()
-                    .id(img.getId())
-                    .publicId(img.getPublicId())
-                    .imageUrl(img.getImageUrl())
-                    .size(img.getSize())
-                    .build())
-             .toList();
-   }
-
-   private ProductDTO convertProduct(Product product) {
-      List<ImagesDTO> imageDTOs = toImageDTOs(product.getImages());
-      return ProductDTO.builder()
-             .id(product.getId())
-             .namePro(product.getNamePro())
-             .imageUrl(product.getImageUrl())
-             .price(product.getPrice())
-             .description(product.getDescription())
-             .status(product.getStatus())
-             .averageRating(product.getAverageRating())
-             .createdAt(product.getCreatedAt())
-             .updatedAt(product.getUpdatedAt())
-             .imagesDTO(imageDTOs)
-             .build();
-   }
+    }
 }

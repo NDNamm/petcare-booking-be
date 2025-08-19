@@ -37,7 +37,7 @@ public class UserDTO {
    @Size(min = 8, max = 20, message = "PASSWORD_INVALID")
    private String confirmPassword;
 
-   private LocalDateTime createdAt;
-   private LocalDateTime updatedAt;
+   private String createdAt;
+   private String updatedAt;
    private String roleName;
 }

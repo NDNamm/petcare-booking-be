@@ -102,8 +102,8 @@ public class CategoriesServiceImpl implements CategoriesService {
              .nameCate(cate.getNameCate())
              .imageUrl(cate.getImageUrl())
              .description(cate.getDescription())
-             .createdAt(cate.getCreatedAt())
-             .updatedAt(cate.getUpdatedAt())
+             .createdAt(cate.getCreatedAt().toString())
+             .updatedAt(cate.getUpdatedAt().toString())
              .build());
    }
 
@@ -113,8 +113,8 @@ public class CategoriesServiceImpl implements CategoriesService {
              .nameCate(categories.getNameCate())
              .imageUrl(categories.getImageUrl())
              .description(categories.getDescription())
-             .createdAt(categories.getCreatedAt())
-             .updatedAt(categories.getUpdatedAt())
+              .createdAt(categories.getCreatedAt().toString())
+              .updatedAt(categories.getUpdatedAt().toString())
              .build();
    }
 }
