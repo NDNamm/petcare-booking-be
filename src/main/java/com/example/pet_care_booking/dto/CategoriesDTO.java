@@ -23,7 +23,7 @@ public class CategoriesDTO {
    private String imageUrl;
 
    private String description;
-   private LocalDateTime createdAt;
-   private LocalDateTime updatedAt;
+   private String createdAt;
+   private String updatedAt;
    private List<Product> product;
 }

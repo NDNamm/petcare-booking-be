@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
              .email(user.getEmail())
              .phoneNumber(user.getPhoneNumber())
              .password(user.getPassword())
-             .createdAt(user.getCreatedAt())
-             .updatedAt(user.getUpdatedAt())
+             .createdAt(user.getCreatedAt().toString())
+             .updatedAt(user.getUpdatedAt().toString())
              .roleName(user.getRole().getName())
              .build());
    }

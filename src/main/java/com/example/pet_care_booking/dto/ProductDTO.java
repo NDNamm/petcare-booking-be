@@ -29,8 +29,8 @@ public class ProductDTO {
    @NotBlank(message = "PRODUCT_STATUS_INVALID")
    private ProductStatus status;
    private String description;
-   private LocalDateTime createdAt;
-   private LocalDateTime updatedAt;
+   private String createdAt;
+   private String updatedAt;
    private List<ImagesDTO> imagesDTO;
    private Long categoryId;
    private BigDecimal averageRating;

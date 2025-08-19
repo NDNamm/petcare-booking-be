@@ -45,7 +45,7 @@ public class CartServiceImpl implements CartService {
       CartDTO cartDTO = CartDTO.builder()
              .id(cart.getId())
              .userId(user.getId())
-             .createdAt(cart.getCreatedAt())
+             .createdAt(cart.getCreatedAt().toString())
              .build();
       return getCartDTO(cart, cartDTO);
    }
@@ -108,7 +108,7 @@ public class CartServiceImpl implements CartService {
       }
       CartDTO cartDTO = new CartDTO();
       cartDTO.setId(cart.getId());
-      cartDTO.setCreatedAt(cart.getCreatedAt());
+      cartDTO.setCreatedAt(cart.getCreatedAt().toString());
 
       return getCartDTO(cart, cartDTO);
    }
