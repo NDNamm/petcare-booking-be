@@ -51,10 +51,10 @@ public class Product {
    @JoinColumn(name = "category_id")
    private Categories category;
 
-//   @OneToMany(mappedBy = "product")
-//   @JsonIgnore
-//   private List<OrderDetail> orderDetails;
-//
+   @OneToMany(mappedBy = "product")
+   @JsonIgnore
+   private List<OrderDetail> orderDetails;
+
    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    private List<Images> images;
 

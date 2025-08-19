@@ -34,14 +34,14 @@ public class SecurityConfig {
                   .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history",
                         "/api/orderDetail/**")
                   .permitAll()
-                  .requestMatchers(HttpMethod.POST, "/api/cart/session/**", "/api/order/**").permitAll()
+                  .requestMatchers("/api/cart/session/**", "/api/order/**").permitAll()
 
                   // Rating GET public, nhưng POST/PUT/DELETE cần login
                   .requestMatchers(HttpMethod.GET, "/api/rating/**").permitAll()
                   .requestMatchers("/api/rating/**").hasAnyRole("ADMIN", "USER")
 
                   // Admin only - more specific rules
-                  .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                  .requestMatchers("/api/admin/**", "/api/category/").hasRole("ADMIN")
                   .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")
 
                   // Any other API requests need authentication

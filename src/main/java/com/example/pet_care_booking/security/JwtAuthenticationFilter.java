@@ -27,11 +27,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                    HttpServletResponse response,
                                    FilterChain chain) throws IOException, ServletException {
       String authHeader = request.getHeader("Authorization");
-
+      if (request.getServletPath().startsWith("/api/auth/refresh-token")) {
+         chain.doFilter(request, response);
+         return;
+      }
       if (authHeader == null || !authHeader.startsWith("Bearer ")) {
          chain.doFilter(request, response);
          return;
       }
+
 
       String token = authHeader.substring(7);
       String username = jwtUtils.extractUsername(token);

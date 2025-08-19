@@ -107,7 +107,8 @@ public class ProductServiceImpl implements ProductService {
             imageService.deleteOldImages(product);
             // Upload ảnh mới
             List<Images> newImages = imageService.uploadProduct(image, dto.getNamePro(), product);
-            product.setImages(newImages);
+            product.getImages().clear();
+            product.getImages().addAll(newImages);
             product.setImageUrl(newImages.get(0).getImageUrl());
          }
          Product product1 = productRepository.save(product);
