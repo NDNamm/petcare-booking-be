@@ -44,7 +44,7 @@ public class Product {
    private LocalDateTime updatedAt;
 
    @Column(name = "average_rating")
-   private BigDecimal averageRating;
+   private Double averageRating;
 
    @ManyToOne
    @JsonIgnore

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class RatingDTO {
-   private Integer ratingValue;
+   private Double ratingValue;
    private Long id;
    private String comment;
    private LocalDateTime createdAt;

@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,6 +46,7 @@ public class RatingServiceImpl implements RatingService {
              .build();
 
       ratingRepository.save(rating);
+      getAverageRating(productId);
       return getRating(rating);
    }
 
@@ -56,7 +56,7 @@ public class RatingServiceImpl implements RatingService {
       Product product = productRepository.findById(productId)
              .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
-      Pageable pageable = PageRequest.of(page, size, Sort.by("updated_At").descending());
+      Pageable pageable = PageRequest.of(page, size, Sort.by("updateAt").descending());
       Page<Rating> ratings = ratingRepository.findRatingByProduct(product, pageable);
 
       return ratings.map(rating -> RatingDTO.builder()
@@ -69,7 +69,7 @@ public class RatingServiceImpl implements RatingService {
    }
 
    @Override
-   public void updateRating(RatingDTO ratingDTO, Long productId, String userName) {
+   public RatingDTO updateRating(RatingDTO ratingDTO, Long productId, String userName) {
       User user = userRepository.findUserByUserName(userName)
              .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -90,17 +90,50 @@ public class RatingServiceImpl implements RatingService {
 
       rating.setUpdateAt(LocalDateTime.now());
       rating.setProduct(product);
+      ratingRepository.save(rating);
+      getAverageRating(productId);
+      return getRating(rating);
    }
 
    @Override
    public void deleteRating(Long productId, String requesterId, String userName) {
+      User user = userRepository.findUserByUserName(userName)
+             .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+      Rating rating = ratingRepository.findRatingByProductIdAndUserId(productId, user.getId())
+             .orElseThrow(() -> new AppException(ErrorCode.RATING_NOT_FOUND));
+
+      if (rating.getUser().getId().equals(user.getId()) || user.getRole().getName().equals("ADMIN")) {
+         ratingRepository.delete(rating);
+         return;
+      }
+
+      throw new AppException(ErrorCode.UNAUTHORIZED);
+   }
+
+
+   public void getAverageRating(Long productId) {
+      Product product = productRepository.findById(productId)
+             .orElseThrow(() -> new RuntimeException("Product Not Found"));
+
+      List<Rating> ratings = ratingRepository.findRatingByProductId(productId);
+      if (ratings.isEmpty()) {
+         return;
+      }
+
+      double sum = 0.0;
+      for (Rating rating : ratings) {
+         sum += rating.getRatingValue();
+      }
+
+      double average = sum / ratings.size();
+      average = Math.round(average * 100.0) / 100.0;
+
+      product.setAverageRating(average);
+      productRepository.save(product);
 
    }
 
-   @Override
-   public BigDecimal getAverageRating(Long productId) {
-      return null;
-   }
 
    private RatingDTO getRating(Rating rating) {
       return RatingDTO.builder()
@@ -109,6 +142,8 @@ public class RatingServiceImpl implements RatingService {
              .comment(rating.getComment())
              .createdAt(rating.getCreatedAt())
              .updatedAt(rating.getUpdateAt())
+             .namePro(rating.getProduct().getNamePro())
+             .userName(rating.getUser().getUserName())
              .build();
    }
 }

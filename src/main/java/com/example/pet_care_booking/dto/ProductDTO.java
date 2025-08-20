@@ -33,5 +33,5 @@ public class ProductDTO {
    private String updatedAt;
    private List<ImagesDTO> imagesDTO;
    private Long categoryId;
-   private BigDecimal averageRating;
+   private Double averageRating;
 }

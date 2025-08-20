@@ -19,7 +19,7 @@ public class CategoriesController {
    private final CategoriesService categoriesService;
 
    @GetMapping("")
-   public ApiResponse<Page<CategoriesDTO>> getAllCategory(@RequestParam String name,
+   public ApiResponse<Page<CategoriesDTO>> getAllCategory(@RequestParam(required = false) String name,
                                                           @RequestParam(defaultValue = "0") int page,
                                                           @RequestParam(defaultValue = "5") int size) {
 

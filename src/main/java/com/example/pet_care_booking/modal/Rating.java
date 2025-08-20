@@ -18,7 +18,7 @@ public class Rating {
    private Long id;
 
    @Column(name = "rating_value", nullable = false)
-   private int ratingValue;
+   private Double ratingValue;
 
    @Column(name = "comment", nullable = false)
    private String comment;
