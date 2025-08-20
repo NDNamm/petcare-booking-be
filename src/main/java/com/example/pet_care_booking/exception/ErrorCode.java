@@ -62,7 +62,10 @@ public enum ErrorCode {
    //Authentication
    NOT_FOUND(10001, "Authentication credentials or session not found", HttpStatus.NOT_FOUND),
    UNAUTHORIZED(10002,"You are not authorized to perform this action", HttpStatus.UNAUTHORIZED),
-   ;
+
+
+   //Rating
+   RATING_NOT_FOUND(10001, "Rating not found", HttpStatus.NOT_FOUND);
 
    private final int code;
    private final String message;

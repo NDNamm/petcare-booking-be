@@ -105,10 +105,11 @@ public class ProductServiceImpl implements ProductService {
             // Nếu có ảnh mới thì mới xóa ảnh cũ và upload ảnh mới
             if (image != null && image.length > 0) {
                 imageService.deleteOldImages(product);
-                // Upload ảnh mới
-                List<Images> newImages = imageService.uploadProduct(image, dto.getNamePro(), product);
-                product.setImages(newImages);
-                product.setImageUrl(newImages.get(0).getImageUrl());
+               // Upload ảnh mới
+               List<Images> newImages = imageService.uploadProduct(image, dto.getNamePro(), product);
+               product.getImages().clear();
+               product.getImages().addAll(newImages);
+               product.setImageUrl(newImages.get(0).getImageUrl());
             }
             Product product1 = productRepository.save(product);
 
@@ -125,20 +126,10 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         try {
             imageService.deleteOldImages(product);
-<<<<<<< HEAD
-            // Upload ảnh mới
-            List<Images> newImages = imageService.uploadProduct(image, dto.getNamePro(), product);
-            product.getImages().clear();
-            product.getImages().addAll(newImages);
-            product.setImageUrl(newImages.get(0).getImageUrl());
-         }
-         Product product1 = productRepository.save(product);
-=======
             productRepository.delete(product);
         } catch (IOException e) {
             throw new AppException(ErrorCode.DELETE_IMAGE_FAIL);
         }
->>>>>>> 2f69abd9f729e53be1c1d79716dd87cf8f67acfe
 
     }
 
