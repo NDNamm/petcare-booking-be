@@ -62,6 +62,7 @@ public class ProductServiceImpl implements ProductService {
                 .description(dto.getDescription())
                 .price(dto.getPrice())
                 .status(ProductStatus.AVAILABLE)
+                .sl(dto.getSl())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .category(categories)
@@ -99,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
          product.setPrice(dto.getPrice());
          product.setDescription(dto.getDescription());
          product.setUpdatedAt(LocalDateTime.now());
+         product.setSl(dto.getSl());
          if (dto.getStatus() != null) {
             product.setStatus(dto.getStatus());
          }
@@ -111,8 +113,11 @@ public class ProductServiceImpl implements ProductService {
             product.getImages().addAll(newImages);
             product.setImageUrl(newImages.get(0).getImageUrl());
          }
-         Product product1 = productRepository.save(product);
 
+         if(product.getSl() <=0){
+            product.setStatus(ProductStatus.OUT_OF_STOCK);
+         }
+         Product product1 = productRepository.save(product);
          return convertProduct(product1);
       } catch (IOException e) {
          throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
@@ -159,6 +164,7 @@ public class ProductServiceImpl implements ProductService {
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .status(product.getStatus())
+                .sl(product.getSl())
                 .averageRating(product.getAverageRating())
                 .createdAt(product.getCreatedAt().toString())
                 .updatedAt(product.getUpdatedAt().toString())

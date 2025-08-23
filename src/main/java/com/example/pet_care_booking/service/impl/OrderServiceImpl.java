@@ -142,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
              .city(orderDTO.getAddressDTO().getCity())
              .district(orderDTO.getAddressDTO().getDistrict())
              .commune(orderDTO.getAddressDTO().getCommune())
-//             .sessionId(sessionId)
+             .sessionId(sessionId)
              .order(order)
              .user(user)
              .build();
@@ -162,6 +162,8 @@ public class OrderServiceImpl implements OrderService {
       order.setPayment(payments);
 
       orderRepository.save(order);
+
+
    }
 
    @Override
@@ -254,6 +256,13 @@ public class OrderServiceImpl implements OrderService {
                throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
             }
 
+            product.setSl(product.getSl() - cartItem.getQuantity());
+            if (product.getSl() <= 0) {
+               product.setStatus(ProductStatus.OUT_OF_STOCK);
+            }
+
+            productRepository.save(product);
+
             OrderDetail orderDetail = OrderDetail.builder()
                    .order(order)
                    .product(product)
@@ -272,6 +281,11 @@ public class OrderServiceImpl implements OrderService {
 
             if (!product.getStatus().equals(ProductStatus.AVAILABLE)) {
                throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+            }
+
+            product.setSl(product.getSl() - dto.getQuantity());
+            if (product.getSl() <= 0) {
+               product.setStatus(ProductStatus.OUT_OF_STOCK);
             }
 
             OrderDetail orderDetail = OrderDetail.builder()

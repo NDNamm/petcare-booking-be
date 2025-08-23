@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -25,7 +24,7 @@ public class ProductDTO {
 
    @NotBlank(message = "PRODUCT_PRICE_INVALID")
    private BigDecimal price;
-
+   private Long sl;
    @NotBlank(message = "PRODUCT_STATUS_INVALID")
    private ProductStatus status;
    private String description;

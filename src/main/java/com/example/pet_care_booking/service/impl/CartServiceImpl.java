@@ -10,6 +10,7 @@ import com.example.pet_care_booking.modal.Cart;
 import com.example.pet_care_booking.modal.CartItem;
 import com.example.pet_care_booking.modal.Product;
 import com.example.pet_care_booking.modal.User;
+import com.example.pet_care_booking.modal.enums.ProductStatus;
 import com.example.pet_care_booking.repository.CartItemRepository;
 import com.example.pet_care_booking.repository.CartRepository;
 import com.example.pet_care_booking.repository.ProductRepository;
@@ -44,7 +45,7 @@ public class CartServiceImpl implements CartService {
       Cart cart = getCartUser(user);
       CartDTO cartDTO = CartDTO.builder()
              .id(cart.getId())
-              .totalMoney(cart.getTotalMoney())
+             .totalMoney(cart.getTotalMoney())
              .userId(user.getId())
              .createdAt(cart.getCreatedAt().toString())
              .build();
@@ -206,14 +207,14 @@ public class CartServiceImpl implements CartService {
          cart.setUser(user);
          cart.setCreatedAt(LocalDateTime.now());
          cart = cartRepository.save(cart);
-      }else{
-          Cart existCart = cart;
-          List<CartItem> cartItem = cartItemRepository.findByCart(existCart);
-          BigDecimal total = BigDecimal.ZERO;
-          for(CartItem item : cartItem){
-              total = total.add(item.getTotalPrice());
-          }
-          existCart.setTotalMoney(total);
+      } else {
+         Cart existCart = cart;
+         List<CartItem> cartItem = cartItemRepository.findByCart(existCart);
+         BigDecimal total = BigDecimal.ZERO;
+         for (CartItem item : cartItem) {
+            total = total.add(item.getTotalPrice());
+         }
+         existCart.setTotalMoney(total);
       }
       return cart;
    }
@@ -248,6 +249,13 @@ public class CartServiceImpl implements CartService {
    private void addProductToCart(CartItemDTO cartItemDTO, Cart cart) {
       Product product = productRepository.findById(cartItemDTO.getProductId())
              .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+
+      if (product.getSl() < cartItemDTO.getQuantity() ||
+             product.getStatus() == ProductStatus.DISCONTINUED ||
+             product.getStatus() == ProductStatus.OUT_OF_STOCK) {
+         throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+      }
 
       Optional<CartItem> existingItem = cart.getItems().stream()
              .filter(item -> item.getProduct().getId().equals(product.getId()))
@@ -290,8 +298,8 @@ public class CartServiceImpl implements CartService {
          cartItemRepository.save(cartItem);
          List<CartItem> cartItems = cartItemRepository.findByCart(cart);
          BigDecimal total = BigDecimal.ZERO;
-         for(CartItem item :  cartItems){
-             total = total.add(item.getTotalPrice());
+         for (CartItem item : cartItems) {
+            total = total.add(item.getTotalPrice());
          }
          cart.setTotalMoney(cart.getTotalMoney().add(total));
 
