@@ -52,7 +52,7 @@ public class CartController {
    }
 
    @DeleteMapping("/delete/{cartItemId}")
-   public ApiResponse<CartDTO> deleteCartItem(@PathVariable Long cartItemId) {
+       public ApiResponse<CartDTO> deleteCartItem(@PathVariable Long cartItemId) {
       String email = SecurityContextHolder.getContext().getAuthentication().getName();
       ApiResponse<CartDTO> apiResponse = new ApiResponse<>();
       cartService.deleteCartItem(email, cartItemId);

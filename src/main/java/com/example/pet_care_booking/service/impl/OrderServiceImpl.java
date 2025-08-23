@@ -141,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
              .city(orderDTO.getAddressDTO().getCity())
              .district(orderDTO.getAddressDTO().getDistrict())
              .commune(orderDTO.getAddressDTO().getCommune())
-             .sessionId(sessionId)
+//             .sessionId(sessionId)
              .order(order)
              .user(user)
              .build();
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
              .paymentDate(LocalDate.now())
              .order(order)
              .build();
-      PaymentMethod method = orderDTO.getPaymentMethod();
+      PaymentMethod method = PaymentMethod.COD;
       if (method != null) {
          payments.setPaymentMethod(method);
       } else {

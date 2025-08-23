@@ -44,6 +44,7 @@ public class CartServiceImpl implements CartService {
       Cart cart = getCartUser(user);
       CartDTO cartDTO = CartDTO.builder()
              .id(cart.getId())
+              .totalMoney(cart.getTotalMoney())
              .userId(user.getId())
              .createdAt(cart.getCreatedAt().toString())
              .build();
@@ -205,6 +206,14 @@ public class CartServiceImpl implements CartService {
          cart.setUser(user);
          cart.setCreatedAt(LocalDateTime.now());
          cart = cartRepository.save(cart);
+      }else{
+          Cart existCart = cart;
+          List<CartItem> cartItem = cartItemRepository.findByCart(existCart);
+          BigDecimal total = BigDecimal.ZERO;
+          for(CartItem item : cartItem){
+              total = total.add(item.getTotalPrice());
+          }
+          existCart.setTotalMoney(total);
       }
       return cart;
    }
@@ -246,7 +255,6 @@ public class CartServiceImpl implements CartService {
 
       CartItem cartItem;
       Long addedQuantity = cartItemDTO.getQuantity();
-      BigDecimal itemPrice = cartItemDTO.getPrice();
 
       if (existingItem.isPresent()) {
          cartItem = existingItem.get();
@@ -258,9 +266,9 @@ public class CartServiceImpl implements CartService {
                 .cart(cart)
                 .product(product)
                 .quantity(cartItemDTO.getQuantity())
-                .price(cartItemDTO.getPrice())
+                .price(product.getPrice())
                 .build();
-         cartItem.updateQuantityAndPrice(addedQuantity, itemPrice);
+         cartItem.updateQuantityAndPrice(addedQuantity, product.getPrice());
       }
 
       cartItemRepository.save(cartItem);
@@ -274,14 +282,19 @@ public class CartServiceImpl implements CartService {
       Optional<CartItem> existingItem = cart.getItems().stream()
              .filter(item -> item.getProduct().getId().equals(product.getId()))
              .findFirst();
-
       if (existingItem.isPresent()) {
          CartItem cartItem = existingItem.get();
          cartItem.setQuantity(cartItemDTO.getQuantity());
          cartItem.setPrice(cartItemDTO.getPrice());
          cartItem.updateQuantityAndPrice(cartItemDTO.getQuantity(), cartItemDTO.getPrice());
-
          cartItemRepository.save(cartItem);
+         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
+         BigDecimal total = BigDecimal.ZERO;
+         for(CartItem item :  cartItems){
+             total = total.add(item.getTotalPrice());
+         }
+         cart.setTotalMoney(cart.getTotalMoney().add(total));
+
       } else {
          throw new AppException(ErrorCode.CART_ITEM_NOT_FOUND);
       }
