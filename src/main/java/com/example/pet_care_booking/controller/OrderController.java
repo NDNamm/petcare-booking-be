@@ -23,12 +23,11 @@ public class OrderController {
    @GetMapping("")
    public ApiResponse<Page<OrderDTO>> getAllOrders(@RequestParam(required = false)String name,
                                                    @RequestParam(required = false) String phoneNumber,
-                                                   @RequestParam(required = false)String address,
                                                    @RequestParam(required = false)String status,
                                                    @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "10") int size) {
       ApiResponse<Page<OrderDTO>> apiResponse = new ApiResponse<>();
-      apiResponse.setData(orderService.getAllOrders(name, phoneNumber, status , address, page, size));
+      apiResponse.setData(orderService.getAllOrders(name, phoneNumber, status, page, size));
       return apiResponse;
    }
 

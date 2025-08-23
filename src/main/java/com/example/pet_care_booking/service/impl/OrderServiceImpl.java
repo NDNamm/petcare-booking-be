@@ -38,14 +38,14 @@ public class OrderServiceImpl implements OrderService {
    private final ProductRepository productRepository;
 
    @Override
-   public Page<OrderDTO> getAllOrders(String name, String phoneNumber, String address, String status, int page, int size) {
+   public Page<OrderDTO> getAllOrders(String name, String phoneNumber, String status, int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
       Page<Order> orderPage;
 
-      if (name == null || name.isEmpty() && phoneNumber == null || phoneNumber.isEmpty() && address == null || address.isEmpty()) {
+      if (name == null && phoneNumber == null && status == null){
          orderPage = orderRepository.findAll(pageable);
       } else {
-         orderPage = orderRepository.searchOrders(name, phoneNumber, address, status, pageable);
+         orderPage = orderRepository.searchOrders(name, phoneNumber, status, pageable);
       }
 
       return getOrder(orderPage);
@@ -54,7 +54,8 @@ public class OrderServiceImpl implements OrderService {
    private Page<OrderDTO> getOrder(Page<Order> orders) {
       return orders.map(order -> OrderDTO.builder()
              .id(order.getId())
-             .userId(order.getUser().getId())
+             .userId(order.getUser() != null ? order.getUser().getId() : null)
+             .sessionId(order.getSessionId())
              .name(order.getName())
              .phoneNumber(order.getPhoneNumber())
              .status(order.getStatus())

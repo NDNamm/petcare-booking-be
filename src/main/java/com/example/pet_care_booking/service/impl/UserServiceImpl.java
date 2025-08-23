@@ -1,5 +1,6 @@
 package com.example.pet_care_booking.service.impl;
 
+import com.example.pet_care_booking.dto.RoleDTO;
 import com.example.pet_care_booking.dto.UserDTO;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,19 +29,24 @@ public class UserServiceImpl implements UserService {
    private final PasswordEncoder passwordEncoder;
 
    @Override
-   public Page<UserDTO> getAllUsers(int page, int size) {
+   public Page<UserDTO> getAllUsers(String name, String email, String phoneNumber, int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-      Page<User> users = userRepository.findAll(pageable);
+      Page<User> users;
+
+      if (name == null && email == null && phoneNumber == null) {
+         users = userRepository.findAll(pageable);
+      } else {
+         users = userRepository.searchUser(name, email, phoneNumber, pageable);
+      }
 
       return users.map(user -> UserDTO.builder()
              .id(user.getId())
              .userName(user.getUserName())
              .email(user.getEmail())
              .phoneNumber(user.getPhoneNumber())
-             .password(user.getPassword())
              .createdAt(user.getCreatedAt().toString())
              .updatedAt(user.getUpdatedAt().toString())
-             .roleName(user.getRole().getName())
+             .role(user.getRole())
              .build());
    }
 
@@ -72,20 +79,14 @@ public class UserServiceImpl implements UserService {
    }
 
    @Override
-   public void updateUser( Long id, UserDTO userDTO) {
+   public void updateRoleUser(Long id, UserDTO userDTO) {
       User user = userRepository.findById(id)
              .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-      if(userRepository.findUserByPhoneNumber(userDTO.getPhoneNumber()).isPresent()) {
-         throw new AppException(ErrorCode.PHONE_EXISTED);
-      }
+      Role role = roleRepository.findById(userDTO.getRole().getId())
+             .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 
-      if (!userDTO.getPassword().equals(userDTO.getConfirmPassword())) {
-         throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
-      }
-      user.setPhoneNumber(userDTO.getPhoneNumber());
-      user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-      user.setUpdatedAt(LocalDateTime.now());
+      user.setRole(role);
       userRepository.save(user);
    }
 
@@ -97,8 +98,6 @@ public class UserServiceImpl implements UserService {
       userRepository.delete(user);
    }
 
-   @Override
-   public Page<UserDTO> getUser(String key, int page, int size) {
-      return null;
-   }
+
+
 }

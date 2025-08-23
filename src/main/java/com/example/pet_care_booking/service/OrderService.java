@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 
 public interface OrderService {
    //Admin
-   Page<OrderDTO> getAllOrders(String name, String phoneNumber, String address, String status,int page, int size);
+   Page<OrderDTO> getAllOrders(String name, String phoneNumber, String status,int page, int size);
    void updateOrder(OrderDTO orderDTO, Long orderId);
    void deleteOrder(Long orderId);
 

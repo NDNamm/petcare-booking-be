@@ -6,6 +6,7 @@ import com.example.pet_care_booking.dto.UserDTO;
 import com.example.pet_care_booking.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +29,7 @@ public class AuthController {
    }
 
    @PostMapping("/register")
-   public ApiResponse<Void> register(@RequestBody UserDTO user) {
+   public ApiResponse<Void> register(@Valid @RequestBody UserDTO user) {
       ApiResponse<Void> response = new ApiResponse<>();
       authService.register(user);
       response.setMessage("Đăng kí tài khoản thành công");

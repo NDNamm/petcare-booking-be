@@ -1,8 +1,6 @@
 package com.example.pet_care_booking.repository;
 
 import com.example.pet_care_booking.modal.Order;
-import com.example.pet_care_booking.modal.Product;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,14 +14,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    @Query("""
               SELECT o FROM Order o
               WHERE (:name IS NULL OR LOWER(o.name) LIKE LOWER(CONCAT('%', :name, '%')))
-                AND (:phone IS NULL OR LOWER(o.phoneNumber) LIKE LOWER(CONCAT('%', :phoneNumber, '%')))
-                AND (:address IS NULL OR LOWER(o.address) LIKE LOWER(CONCAT('%', :address, '%')))
-                AND (:status IS NULL OR LOWER(o.status)=:status)
+                AND (:phoneNumber IS NULL OR LOWER(o.phoneNumber) LIKE LOWER(CONCAT('%', :phoneNumber, '%')))
+                AND (:status IS NULL OR LOWER(o.status) LIKE LOWER(CONCAT('%', :status, '%')))
+       
           """)
    Page<Order> searchOrders(
           @Param("name") String name,
           @Param("phoneNumber") String phoneNumber,
-          @Param("address") String address,
           @Param("status") String status,
           Pageable pageable
    );

@@ -17,10 +17,13 @@ public class UserController {
 
 
    @GetMapping("")
-   public ApiResponse<Page<UserDTO>> getAllUsers(@RequestParam(defaultValue = "0") int page,
+   public ApiResponse<Page<UserDTO>> getAllUsers(@RequestParam(required = false) String name,
+                                                 @RequestParam(required = false) String phoneNumber,
+                                                 @RequestParam(required = false) String email,
+                                                 @RequestParam(defaultValue = "0", required = false) int page,
                                                  @RequestParam(defaultValue = "5") int size) {
       ApiResponse<Page<UserDTO>> apiResponse = new ApiResponse<>();
-      apiResponse.setData(userService.getAllUsers(page, size));
+      apiResponse.setData(userService.getAllUsers(name, phoneNumber, email, page, size));
       return apiResponse;
    }
 
@@ -34,10 +37,19 @@ public class UserController {
 
    @PutMapping("/update/{userId}")
    public ApiResponse<UserDTO> updateUser(@PathVariable Long userId,
-                                        @Valid  @RequestBody UserDTO updateUserDTO) {
+                                          @RequestBody UserDTO updateUserDTO) {
       ApiResponse<UserDTO> apiResponse = new ApiResponse<>();
-      userService.updateUser(userId,updateUserDTO);
+      userService.updateRoleUser(userId, updateUserDTO);
       apiResponse.setMessage("Update user thành cong");
       return apiResponse;
    }
+
+   @DeleteMapping("/delete/{userId}")
+   public ApiResponse<Void> deleteUser(@PathVariable Long userId) {
+      ApiResponse<Void> apiResponse = new ApiResponse<>();
+      userService.deleteUser(userId);
+      apiResponse.setMessage("Deleted user thành cong");
+      return apiResponse;
+   }
+
 }

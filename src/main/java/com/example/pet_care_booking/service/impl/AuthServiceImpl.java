@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
    @Override
    public void register(UserDTO dto) {
 
-      Role role = roleRepository.findByName("USER")
+      Role role = roleRepository.findById(2L)
              .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
       Optional<User> existUsername = userRepository.findUserByUserName(dto.getUserName());
       if (existUsername.isPresent()) throw new AppException(ErrorCode.USER_NAME_EXIST);

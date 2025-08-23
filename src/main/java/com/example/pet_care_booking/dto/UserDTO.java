@@ -1,5 +1,6 @@
 package com.example.pet_care_booking.dto;
 
+import com.example.pet_care_booking.modal.Role;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -27,8 +28,6 @@ public class UserDTO {
    @Size(min = 10, max = 15, message = "PHONE_INVALID")
    private String phoneNumber;
 
-   private LocalDate dob;
-
    @NotBlank(message = "PASSWORD_INVALID")
    @Size(min = 8, max = 20, message = "PASSWORD_INVALID")
    private String password;
@@ -39,5 +38,5 @@ public class UserDTO {
 
    private String createdAt;
    private String updatedAt;
-   private String roleName;
+   private Role role;
 }
