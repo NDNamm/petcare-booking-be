@@ -6,8 +6,7 @@ import lombok.Getter;
 public enum OrderStatus {
    PENDING("Chờ xác nhận"),
    CONFIRMED("Đã xác nhận"),
-   IN_PREPARATION("Đang pha chế"),
-   SERVED("Đã phục vụ"),
+   SHIPPING("Đang giao hàng"),
    COMPLETED("Hoàn tất"),
    CANCELED("Đã hủy");
 
