@@ -65,7 +65,14 @@ public enum ErrorCode {
 
 
    //Rating
-   RATING_NOT_FOUND(10001, "Rating not found", HttpStatus.NOT_FOUND);
+   RATING_NOT_FOUND(11001, "Rating not found", HttpStatus.NOT_FOUND),
+
+   //Vet
+   VET_EXIST(12001, "Vet Phone, Email already exists ", HttpStatus.BAD_REQUEST),
+   VET_NOT_FOUND(12002, "Vet Phone not found", HttpStatus.NOT_FOUND),
+
+   //APPOINTMENT
+   APPOINTMENT_NOT_FOUND(13001, "Appointment not found", HttpStatus.NOT_FOUND),;
 
    private final int code;
    private final String message;
