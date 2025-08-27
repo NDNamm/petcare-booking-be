@@ -49,7 +49,6 @@ public class RatingServiceImpl implements RatingService {
       getAverageRating(productId);
       return getRating(rating);
    }
-
    @Override
    public Page<RatingDTO> getAllRatings(Long productId, int page, int size) {
 

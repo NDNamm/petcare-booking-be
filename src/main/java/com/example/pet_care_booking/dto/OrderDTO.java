@@ -16,9 +16,10 @@ public class OrderDTO {
    private Long id;
    private String sessionId;
    private Long userId;
-   private String name;
+   private String fullName;
    private String phoneNumber;
    private BigDecimal totalAmount;
+   private String createdAt;
    private LocalDateTime orderDate;
    private OrderStatus status;
    private String note;

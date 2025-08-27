@@ -23,7 +23,8 @@ public class Product {
 
    @Column(name = "image_url")
    private String imageUrl;
-
+   @Column()
+   private String slug;
    @Column(name = "name", nullable = false, unique = true)
    private String namePro;
 

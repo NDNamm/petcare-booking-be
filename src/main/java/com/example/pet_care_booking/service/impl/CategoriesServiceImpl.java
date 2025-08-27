@@ -37,7 +37,7 @@ public class CategoriesServiceImpl implements CategoriesService {
 
       return getCategoryResponse(pageCate);
    }
-    
+
    @Override
    public CategoriesDTO addCate(CategoriesDTO categoriesDTO, MultipartFile image) {
       boolean categories = categoriesRepository.existsByNameCate(categoriesDTO.getNameCate());

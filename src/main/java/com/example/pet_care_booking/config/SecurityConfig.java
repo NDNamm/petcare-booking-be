@@ -30,7 +30,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                   // Public APIs
-                  .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**").permitAll()
+                  .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**", "/api/product/product-details/*").permitAll()
                   .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history",
                         "/api/orderDetail/**")
                   .permitAll()
