@@ -17,6 +17,7 @@ import com.example.pet_care_booking.repository.UserRepository;
 import com.example.pet_care_booking.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
       Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
       Page<Order> orderPage;
 
-      if (name == null && phoneNumber == null && status == null){
+      if (name == null && phoneNumber == null && status == null) {
          orderPage = orderRepository.findAll(pageable);
       } else {
          orderPage = orderRepository.searchOrders(name, phoneNumber, status, pageable);
@@ -171,14 +172,18 @@ public class OrderServiceImpl implements OrderService {
       Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
       Page<Order> orders;
 
-      if (status != null) {
-         orders = orderRepository.findOrders(userName, sessionId, status, pageable);
+      if (userName != null && !"anonymousUser".equals(userName)) {
+         userRepository.findUserByUserName(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+         orders = orderRepository.findOrdersByUser(userName, status, pageable);
       } else {
-         orders = orderRepository.findAll(pageable);
+         orders = orderRepository.findOrdersBySession( sessionId, status, pageable);
       }
 
       return getOrder(orders);
    }
+
 
    @Override
    public void updateOrderByClient(OrderDTO orderDTO, Long orderId, String userName, String sessionId) {

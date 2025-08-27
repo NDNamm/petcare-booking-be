@@ -6,7 +6,6 @@ import lombok.Getter;
 public enum Status {
    PENDING("Chờ xác nhận"),
    CONFIRMED("Đã xác nhận"),
-   SHIPPING("Đang giao hàng"),
    COMPLETED("Hoàn tất"),
    CANCELED("Đã hủy");
 

@@ -4,6 +4,7 @@ import com.example.pet_care_booking.dto.AppointmentsDTO;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
 import com.example.pet_care_booking.modal.Appointments;
+import com.example.pet_care_booking.modal.enums.Status;
 import com.example.pet_care_booking.repository.AppointmentRepository;
 import com.example.pet_care_booking.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class AppointmentServiceImpl implements AppointmentService {
    private final AppointmentRepository appointmentRepository;
 
    @Override
-   public Page<AppointmentsDTO> getAppointments(String nameOwer, String phoneNumber, String email, String namePet, String nameVet, String status, int page, int size) {
+   public Page<AppointmentsDTO> getAppointments(String nameOwer, String phoneNumber, String email, String namePet, String nameVet, Status status, int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
       Page<Appointments> apps;
 

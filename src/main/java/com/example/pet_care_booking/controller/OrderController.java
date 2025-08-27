@@ -110,14 +110,14 @@ public class OrderController {
                                                       @RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "9") int size) {
 
-      String email = null;
+      String userNamne = null;
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       if (authentication != null && authentication.isAuthenticated() && !ANONYMOUS_USER.equals(authentication.getName())) {
-         email = authentication.getName();
+         userNamne = authentication.getName();
       }
 
       ApiResponse<Page<OrderDTO>> apiResponse = new ApiResponse<>();
-      apiResponse.setData(orderService.getOrderClient(email, sessionId, status , page, size));
+      apiResponse.setData(orderService.getOrderClient(userNamne, sessionId, status , page, size));
       return apiResponse;
    }
 }

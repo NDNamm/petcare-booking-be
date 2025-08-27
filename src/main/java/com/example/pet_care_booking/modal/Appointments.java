@@ -44,6 +44,7 @@ public class Appointments {
    private PetGender petGender;
 
    @Column(name = "status")
+   @Enumerated(EnumType.STRING)
    private Status status;
 
    @Column(name = "note")
@@ -58,7 +59,8 @@ public class Appointments {
    @Column(name = "updated_at")
    private LocalDateTime updatedAt;
 
-   @OneToOne(mappedBy = "appointment")
+   @ManyToOne
    @JsonIgnore
+   @JoinColumn(name = "vet_id")
    private Veterinarians veterinarian;
 }

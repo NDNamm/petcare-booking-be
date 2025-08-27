@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -26,7 +28,7 @@ public class Veterinarians {
    @Column(name = "phone_number")
    private String phoneNumber;
 
-   @OneToOne(mappedBy = "veterinarian")
+   @OneToMany(mappedBy = "veterinarian",cascade = CascadeType.ALL, orphanRemoval = true)
    @JsonIgnore
-   private Appointments appointment;
+   private List<Appointments> appointment;
 }
