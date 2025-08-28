@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,8 +24,11 @@ public class Appointments {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
 
-   @Column(name = "name_ower", nullable = false)
-   private String nameOwer;
+   @Column(name = "session_id")
+   private String sessionId;
+
+   @Column(name = "owner_name", nullable = false)
+   private String ownerName;
 
    @Column(name = "phone_number", nullable = false)
    private String phoneNumber;
@@ -50,8 +55,11 @@ public class Appointments {
    @Column(name = "note")
    private String note;
 
-   @Column(name = "appointment_date")
-   private Date appointmentDate;
+   @Column(name = "appointment_day")
+   private Date appointmentDay;
+
+   @Column(name = "appointment_time")
+   private Time appointmentTime;
 
    @Column(name = "created_at")
    private LocalDateTime createdAt;
@@ -63,4 +71,18 @@ public class Appointments {
    @JsonIgnore
    @JoinColumn(name = "vet_id")
    private Veterinarians veterinarian;
+
+   @ManyToOne
+   @JsonIgnore
+   @JoinColumn(name = "user_id")
+   private User user;
+
+   @ManyToMany(cascade = CascadeType.PERSIST)
+   @JoinTable(
+          name = "pet_examination",
+          joinColumns = @JoinColumn(name = "appointment_id"),
+          inverseJoinColumns = @JoinColumn(name = "examination_id")
+   )
+   private List<Examination> examination;
+
 }

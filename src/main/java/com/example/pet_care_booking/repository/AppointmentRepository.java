@@ -15,7 +15,7 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
    @Query("""
        SELECT a FROM Appointments a
        LEFT JOIN a.veterinarian v
-       WHERE (:ownerName IS NULL OR LOWER(a.nameOwer) LIKE LOWER(CONCAT('%', :ownerName, '%')))
+       WHERE (:ownerName IS NULL OR LOWER(a.ownerName) LIKE LOWER(CONCAT('%', :ownerName, '%')))
        AND (:phoneNumber IS NULL OR LOWER(a.phoneNumber) LIKE LOWER(CONCAT('%', :phoneNumber, '%')))
        AND (:email IS NULL OR LOWER(a.email) LIKE LOWER(CONCAT('%', :email, '%')))
        AND (:petName IS NULL OR LOWER(a.petName) LIKE LOWER(CONCAT('%', :petName, '%')))
@@ -27,7 +27,7 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
                                         @Param("email") String email,
                                         @Param("petName") String petName,
                                         @Param("vetName") String vetName,
-                                        @Param("status") Status status,
+                                        @Param("status") String status,
                                         Pageable pageable);
 
 }

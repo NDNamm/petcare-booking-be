@@ -32,7 +32,7 @@ public class SecurityConfig {
                   // Public APIs
                   .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**").permitAll()
                   .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history",
-                        "/api/orderDetail/**")
+                        "/api/orderDetail/**", "/api/examination/**", "/api/vet/**")
                   .permitAll()
                   .requestMatchers("/api/cart/session/**", "/api/order/**").permitAll()
 
