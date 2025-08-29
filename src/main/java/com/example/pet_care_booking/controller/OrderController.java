@@ -91,12 +91,12 @@ public class OrderController {
    public ApiResponse<OrderDTO> cancelOrder(@PathVariable Long orderId,
                                             @RequestParam(required = false) String sessionId) {
 
-      String email = SecurityContextHolder.getContext().getAuthentication().getName();
-      boolean isAnonymous = email == null || email.equals(ANONYMOUS_USER);
+      String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+      boolean isAnonymous = userName == null || userName.equals(ANONYMOUS_USER);
       if (isAnonymous && sessionId != null) {
-         orderService.cancelOrder(orderId, sessionId, email);
+         orderService.cancelOrder(orderId, sessionId, userName);
       } else {
-         orderService.cancelOrder(orderId, null, email);
+         orderService.cancelOrder(orderId, null, userName);
       }
       ApiResponse<OrderDTO> apiResponse = new ApiResponse<>();
       apiResponse.setMessage("Đã hủy đơn hàng thành công");

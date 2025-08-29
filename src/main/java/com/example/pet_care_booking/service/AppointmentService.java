@@ -11,6 +11,6 @@ public interface AppointmentService {
    //Cua User
    AppointmentsDTO addAppointment(Long vetId,AppointmentsDTO appointmentsDTO, String userName, String sessionId);
    Page<AppointmentsDTO> getAppointmentClient(String userName, String sessionId, String status, int page, int size);
-   AppointmentsDTO updateAppointmentByClient(AppointmentsDTO appointmentsDTO, Long orderId, String userName, String sessionId);
-   void cancelAppointment(Long orderId, String userName, String sessionId);
+   AppointmentsDTO updateAppointmentByClient(AppointmentsDTO appointmentsDTO, Long appointId, String userName, String sessionId);
+   void cancelAppointment(Long appointId, String userName, String sessionId);
 }

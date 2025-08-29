@@ -3,10 +3,11 @@ package com.example.pet_care_booking.dto;
 import com.example.pet_care_booking.modal.Veterinarians;
 import com.example.pet_care_booking.modal.enums.PetGender;
 import com.example.pet_care_booking.modal.enums.PetType;
-import com.example.pet_care_booking.modal.enums.Status;
+import com.example.pet_care_booking.modal.enums.AppointStatus;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -23,10 +24,11 @@ public class AppointmentsDTO {
    private PetType petType;
    private int age;
    private PetGender petGender;
-   private Status status;
+   private AppointStatus appointStatus;
    private String note;
    private Date appointmentDay;
    private Time appointmentTime;
+   private BigDecimal totalPrice;
    private LocalDateTime createdAt;
    private LocalDateTime updatedAt;
    private Veterinarians veterinarian;
