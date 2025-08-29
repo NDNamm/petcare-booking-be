@@ -1,9 +1,11 @@
 package com.example.pet_care_booking.modal;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,9 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "veterinarians")
-public class Veterinarians {
-
+@Table(name = "examination")
+public class Examination {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
@@ -23,19 +24,17 @@ public class Veterinarians {
    @Column(name = "name")
    private String name;
 
-   @Column(name = "email")
-   private String email;
+   @Column(name = "price", precision = 10, scale = 2)
+   private BigDecimal price;
 
-   @Column(name = "phone_number")
-   private String phoneNumber;
+   @Column(name = "description")
+   private String description;
 
    @Column(name = "created_at")
    private LocalDateTime createdAt;
 
-   @Column(name = "updated_at")
-   private LocalDateTime updatedAt;
-
-   @OneToMany(mappedBy = "veterinarian",cascade = CascadeType.ALL, orphanRemoval = true)
+   @ManyToMany(mappedBy = "examination")
    @JsonIgnore
-   private List<Appointments> appointment;
+   private List<Appointments> appointments;
+
 }

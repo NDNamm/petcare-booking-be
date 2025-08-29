@@ -32,11 +32,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
-    private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
-    private final VariantRepository variantRepository;
+   private final OrderRepository orderRepository;
+   private final UserRepository userRepository;
+   private final CartRepository cartRepository;
+   private final ProductRepository productRepository;
+   private final VariantRepository variantRepository;
 
     @Override
     public Page<OrderDTO> getAllOrders(String name, String phoneNumber, String status, int page, int size) {
@@ -114,29 +114,27 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.NOT_FOUND);
         }
 
-        String name = user != null ? user.getUserName() : orderDTO.getFullName();
-        String phone = user != null ? user.getPhoneNumber() : orderDTO.getPhoneNumber();
-        BigDecimal totalAmount = cart.getItems().stream()
-                .map(CartItem::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalAmouthDTO = BigDecimal.ZERO;
-        for(ItemDTO itemDTO : orderDTO.getItems()) {
-            totalAmouthDTO = totalAmouthDTO.add(itemDTO.getPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())));
-        }
-        BigDecimal totalTmp = orderDTO.getItems() != null && !orderDTO.getItems().isEmpty()
-                ? totalAmouthDTO
-                : totalAmount;
+      if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
+         throw new AppException(ErrorCode.CART_NOT_FOUND);
+      }
 
-        Order order = Order.builder()
-                .user(user)
-                .sessionId(user == null ? sessionId : null)
-                .name(name)
-                .phoneNumber(phone)
-                .orderDate(LocalDateTime.now())
-                .totalAmount(totalTmp)
-                .status(OrderStatus.PENDING)
-                .note(orderDTO.getNote())
-                .build();
+      String name = user != null ? user.getUserName() : orderDTO.getFullName();
+      String phone = user != null ? user.getPhoneNumber() : orderDTO.getPhoneNumber();
+
+      BigDecimal totalAmount = cart.getItems().stream()
+             .map(CartItem::getTotalPrice)
+             .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+      Order order = Order.builder()
+             .user(user)
+             .sessionId(user == null ? sessionId : null)
+             .name(name)
+             .phoneNumber(phone)
+             .orderDate(LocalDateTime.now())
+             .totalAmount(totalAmount)
+             .status(OrderStatus.PENDING)
+             .note(orderDTO.getNote())
+             .build();
 
         List<OrderDetail> orderDetail = buildOrderDetails(order, cart, orderDTO.getItems());
         order.setOrderDetail(orderDetail);
@@ -172,28 +170,33 @@ public class OrderServiceImpl implements OrderService {
     private List<OrderDetail> buildOrderDetails(Order order, Cart cart, List<ItemDTO> itemDTOs) {
         List<OrderDetail> orderDetails = new ArrayList<>();
 
-        if (cart != null && !cart.getItems().isEmpty()) {
-            for (CartItem cartItem : cart.getItems()) {
-                Product product = productRepository.findById(cartItem.getProduct().getId())
-                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-                Variants variant = cartItem.getVariant();
-                if (variant.getStock() < cartItem.getQuantity()) {
-                    throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-                }
-                variant.setStock(variant.getStock() - cartItem.getQuantity());
+      if (cart != null && !cart.getItems().isEmpty()) {
+         for (CartItem cartItem : cart.getItems()) {
+            Product product = productRepository.findById(cartItem.getProduct().getId())
+                   .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+            Variants variant = cartItem.getVariant();
+            if (variant.getStock() < cartItem.getQuantity()) {
+               throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+            }
+            variant.setStock(variant.getStock() - cartItem.getQuantity());
 
                 if (!product.getStatus().equals(ProductStatus.AVAILABLE)) {
                     throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
                 }
 
-                OrderDetail orderDetail = OrderDetail.builder()
-                        .order(order)
-                        .product(product)
-                        .variant(variant)
-                        .quantity(cartItem.getQuantity())
-                        .price(cartItem.getPrice())
-                        .totalPrice(cartItem.getTotalPrice())
-                        .build();
+//                if (product.getSl() <= 0) {
+//                    product.setStatus(ProductStatus.OUT_OF_STOCK);
+//                }
+
+
+            OrderDetail orderDetail = OrderDetail.builder()
+                   .order(order)
+                   .product(product)
+                   .variant(variant)
+                   .quantity(cartItem.getQuantity())
+                   .price(cartItem.getPrice())
+                   .totalPrice(cartItem.getTotalPrice())
+                   .build();
 
                 orderDetails.add(orderDetail);
             }

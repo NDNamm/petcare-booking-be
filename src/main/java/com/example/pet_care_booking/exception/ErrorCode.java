@@ -72,7 +72,11 @@ public enum ErrorCode {
    VET_NOT_FOUND(12002, "Vet Phone not found", HttpStatus.NOT_FOUND),
 
    //APPOINTMENT
-   APPOINTMENT_NOT_FOUND(13001, "Appointment not found", HttpStatus.NOT_FOUND),;
+   APPOINTMENT_NOT_FOUND(13001, "Appointment not found", HttpStatus.NOT_FOUND),
+   APPOINTMENT_CANNOT_BE_MODIFIED(13002, "Appointment cannot be modified", HttpStatus.BAD_REQUEST),
+
+   EXAMINATION_NAME_EXISTED(14001, "Examination name already exists", HttpStatus.BAD_REQUEST),
+   EXAMINATION_NOT_FOUND(14002, "Examination not found", HttpStatus.NOT_FOUND),;
 
    private final int code;
    private final String message;

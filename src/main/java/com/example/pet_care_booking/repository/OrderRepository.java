@@ -1,7 +1,6 @@
 package com.example.pet_care_booking.repository;
 
 import com.example.pet_care_booking.modal.Order;
-import com.example.pet_care_booking.modal.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +17,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
               WHERE (:name IS NULL OR LOWER(o.name) LIKE LOWER(CONCAT('%', :name, '%')))
                 AND (:phoneNumber IS NULL OR LOWER(o.phoneNumber) LIKE LOWER(CONCAT('%', :phoneNumber, '%')))
                 AND (:status IS NULL OR LOWER(o.status) LIKE LOWER(CONCAT('%', :status, '%')))
-                 
           """)
    Page<Order> searchOrders(
           @Param("name") String name,
@@ -28,20 +26,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    );
 
 
-   @Query("SELECT o FROM Order o WHERE o.user.userName = :userName " +
-           "AND (:status IS NULL OR " +
-           "LOWER(o.status) like LOWER(concat('%',:status,'%')))")
+   @Query("SELECT o FROM Order o WHERE o.user.userName = :userName AND (:status IS NULL OR LOWER(o.status) LIKE LOWER(CONCAT('%', :status, '%')))")
    Page<Order> findOrdersByUser(
           @Param("userName") String userName,
           @Param("status") String status,
           Pageable pageable);
 
-   @Query("SELECT o FROM Order o WHERE o.sessionId = :sessionId AND (:status IS NULL OR LOWER(o.status) like concat('%',:status,'%'))")
+   @Query("SELECT o FROM Order o WHERE o.sessionId = :sessionId AND (:status IS NULL OR LOWER(o.status) LIKE LOWER(CONCAT('%', :status, '%')))")
    Page<Order> findOrdersBySession(
           @Param("sessionId") String sessionId,
           @Param("status") String status,
           Pageable pageable);
-
-
 
 }
