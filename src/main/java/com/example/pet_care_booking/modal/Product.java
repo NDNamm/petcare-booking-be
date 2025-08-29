@@ -4,6 +4,7 @@ import com.example.pet_care_booking.modal.enums.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.aspectj.weaver.ast.Var;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,15 +24,16 @@ public class Product {
 
    @Column(name = "image_url")
    private String imageUrl;
-
+   @Column()
+   private String slug;
    @Column(name = "name", nullable = false, unique = true)
    private String namePro;
 
-   @Column(name = "price", precision = 10, scale = 2)
-   private BigDecimal price;
-
-   @Column(name = "sl", nullable = false)
-   private Long sl;
+//   @Column(name = "price", precision = 10, scale = 2)
+//   private BigDecimal price;
+//
+//   @Column(name = "sl", nullable = true)
+//   private Long sl;
 
    @Column(name = "description")
    private String description;
@@ -69,6 +71,7 @@ public class Product {
 //   @JsonIgnore
 //   private List<Rating> rating;
 //
-
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Variants> variants;
 }
 

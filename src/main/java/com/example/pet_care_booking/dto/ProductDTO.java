@@ -14,23 +14,24 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ProductDTO {
-   private Long id;
+    private Long id;
 
-   @NotBlank(message = "PRODUCT_NAME_INVALID")
-   @Size(min = 2, message = "PRODUCT_NAME_INVALID")
-   private String namePro;
-
-   private String imageUrl;
-
-   @NotBlank(message = "PRODUCT_PRICE_INVALID")
-   private BigDecimal price;
-   private Long sl;
-   @NotBlank(message = "PRODUCT_STATUS_INVALID")
-   private ProductStatus status;
-   private String description;
-   private String createdAt;
-   private String updatedAt;
-   private List<ImagesDTO> imagesDTO;
-   private Long categoryId;
-   private Double averageRating;
+    @NotBlank(message = "PRODUCT_NAME_INVALID")
+    @Size(min = 2, message = "PRODUCT_NAME_INVALID")
+    private String namePro;
+    private String slug;
+    private String imageUrl;
+    @NotBlank(message = "PRODUCT_PRICE_INVALID")
+    private BigDecimal price;
+    private Long sl;
+    @NotBlank(message = "PRODUCT_STATUS_INVALID")
+    private ProductStatus status;
+    private String description;
+    private String createdAt;
+    private String updatedAt;
+    private List<ImagesDTO> imagesDTO;
+    private Long categoryId;
+    private String categoryName;
+    private Double averageRating;
+    private List<VariantDTO> variants;
 }
