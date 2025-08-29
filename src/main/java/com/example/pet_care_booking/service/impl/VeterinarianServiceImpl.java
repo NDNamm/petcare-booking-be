@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class VeterinarianServiceImpl implements VeterinarianService {
@@ -36,6 +38,8 @@ public class VeterinarianServiceImpl implements VeterinarianService {
                     .name(vet.getName())
                     .phoneNumber(vet.getPhoneNumber())
                     .email(vet.getEmail())
+                    .createdAt(vet.getCreatedAt())
+                    .updatedAt(vet.getUpdatedAt())
                     .build()
       );
    }
@@ -50,6 +54,8 @@ public class VeterinarianServiceImpl implements VeterinarianService {
              .name(vet.getName())
              .phoneNumber(vet.getPhoneNumber())
              .email(vet.getEmail())
+             .createdAt(LocalDateTime.now())
+             .updatedAt(LocalDateTime.now())
              .build();
       veterinarianRepository.save(vets);
 
@@ -69,6 +75,7 @@ public class VeterinarianServiceImpl implements VeterinarianService {
       vets.setName(vet.getName());
       vets.setPhoneNumber(vet.getPhoneNumber());
       vets.setEmail(vet.getEmail());
+      vets.setUpdatedAt(LocalDateTime.now());
       veterinarianRepository.save(vets);
 
       return getVet(vets);
@@ -88,6 +95,8 @@ public class VeterinarianServiceImpl implements VeterinarianService {
              .name(vet.getName())
              .phoneNumber(vet.getPhoneNumber())
              .email(vet.getEmail())
+             .createdAt(vet.getCreatedAt())
+             .updatedAt(vet.getUpdatedAt())
              .build();
    }
 }

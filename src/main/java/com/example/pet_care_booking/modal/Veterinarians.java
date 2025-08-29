@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,12 @@ public class Veterinarians {
 
    @Column(name = "phone_number")
    private String phoneNumber;
+
+   @Column(name = "created_at")
+   private LocalDateTime createdAt;
+
+   @Column(name = "updated_at")
+   private LocalDateTime updatedAt;
 
    @OneToMany(mappedBy = "veterinarian",cascade = CascadeType.ALL, orphanRemoval = true)
    @JsonIgnore
