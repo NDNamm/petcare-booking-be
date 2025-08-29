@@ -114,16 +114,18 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.NOT_FOUND);
         }
 
-        if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
-            throw new AppException(ErrorCode.CART_NOT_FOUND);
-        }
-
         String name = user != null ? user.getUserName() : orderDTO.getFullName();
         String phone = user != null ? user.getPhoneNumber() : orderDTO.getPhoneNumber();
-
         BigDecimal totalAmount = cart.getItems().stream()
                 .map(CartItem::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalAmouthDTO = BigDecimal.ZERO;
+        for(ItemDTO itemDTO : orderDTO.getItems()) {
+            totalAmouthDTO = totalAmouthDTO.add(itemDTO.getPrice().multiply(BigDecimal.valueOf(itemDTO.getQuantity())));
+        }
+        BigDecimal totalTmp = orderDTO.getItems() != null && !orderDTO.getItems().isEmpty()
+                ? totalAmouthDTO
+                : totalAmount;
 
         Order order = Order.builder()
                 .user(user)
@@ -131,7 +133,7 @@ public class OrderServiceImpl implements OrderService {
                 .name(name)
                 .phoneNumber(phone)
                 .orderDate(LocalDateTime.now())
-                .totalAmount(totalAmount)
+                .totalAmount(totalTmp)
                 .status(OrderStatus.PENDING)
                 .note(orderDTO.getNote())
                 .build();
@@ -183,11 +185,6 @@ public class OrderServiceImpl implements OrderService {
                 if (!product.getStatus().equals(ProductStatus.AVAILABLE)) {
                     throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
                 }
-
-//                if (product.getSl() <= 0) {
-//                    product.setStatus(ProductStatus.OUT_OF_STOCK);
-//                }
-
 
                 OrderDetail orderDetail = OrderDetail.builder()
                         .order(order)
