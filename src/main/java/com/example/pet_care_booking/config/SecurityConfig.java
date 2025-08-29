@@ -30,7 +30,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                   // Public APIs
-                  .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**").permitAll()
+                  .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**", "/api/product/product-details/*").permitAll()
                   .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history",
                         "/api/orderDetail/**", "/api/examination/**", "/api/vet/**")
                   .permitAll()
@@ -43,7 +43,7 @@ public class SecurityConfig {
                   // Admin only - more specific rules
                   .requestMatchers("/api/admin/**", "/api/category/").hasRole("ADMIN")
                   .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")
-
+                    .requestMatchers("/api/variant/**").hasAnyRole("ADMIN")
                   // Any other API requests need authentication
                   .anyRequest().authenticated())
 

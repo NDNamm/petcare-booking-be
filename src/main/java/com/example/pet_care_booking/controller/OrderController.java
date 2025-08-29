@@ -43,7 +43,6 @@ public class OrderController {
 
    @DeleteMapping("delete/{orderId}")
    public ApiResponse<OrderDTO> deleteOrder(@PathVariable Long orderId) {
-
       ApiResponse<OrderDTO> apiResponse = new ApiResponse<>();
       orderService.deleteOrder(orderId);
       apiResponse.setMessage("Đã xóa đơn hàng thành công");
@@ -115,7 +114,6 @@ public class OrderController {
       if (authentication != null && authentication.isAuthenticated() && !ANONYMOUS_USER.equals(authentication.getName())) {
          userNamne = authentication.getName();
       }
-
       ApiResponse<Page<OrderDTO>> apiResponse = new ApiResponse<>();
       apiResponse.setData(orderService.getOrderClient(userNamne, sessionId, status , page, size));
       return apiResponse;

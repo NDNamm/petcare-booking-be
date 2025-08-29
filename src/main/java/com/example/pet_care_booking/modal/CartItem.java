@@ -15,32 +15,37 @@ import java.math.BigDecimal;
 @Table(name = "cart_items")
 public class CartItem {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-   @Column(name = "quantity")
-   private Long quantity;
+    @Column(name = "quantity")
+    private Long quantity;
 
-   @Column(name = "price")
-   private BigDecimal price;
+    @Column(name = "price")
+    private BigDecimal price;
 
-   @Column(name = "total_price")
-   private BigDecimal totalPrice;
+    @Column(name = "total_price")
+    private BigDecimal totalPrice;
 
-   @ManyToOne
-   @JsonIgnore
-   @JoinColumn(name = "product_id")
-   private Product product;
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "product_id")
+    private Product product;
 
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JsonIgnore
-   @JoinColumn(name = "cart_id", nullable = false)
-   private Cart cart;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart;
 
-   public void updateQuantityAndPrice(long quantity, BigDecimal price) {
-      this.quantity = quantity;
-      this.price = price;
-      this.totalPrice = price.multiply(BigDecimal.valueOf(quantity));
-   }
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "variant_id")
+    private Variants variant;
+
+    public void updateQuantityAndPrice(long quantity, BigDecimal price) {
+        this.quantity = quantity;
+        this.price = price;
+        this.totalPrice = price.multiply(BigDecimal.valueOf(quantity));
+    }
 }
