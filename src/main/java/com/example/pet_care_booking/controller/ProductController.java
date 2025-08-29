@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/product")
@@ -21,11 +23,15 @@ public class ProductController {
 
     @GetMapping("")
     public ApiResponse<Page<ProductDTO>> getAllProduct(@RequestParam(required = false) String name,
+                                                       @RequestParam(required = false) Long categoryId,
+                                                       @RequestParam(required = false) String sizeVariant,
+                                                       @RequestParam(required = false) BigDecimal minPrice,
+                                                       @RequestParam(required = false) BigDecimal maxPrice,
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue = "6") int size) {
 
         ApiResponse<Page<ProductDTO>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(productService.getAllProducts(name, page, size));
+        apiResponse.setData(productService.getAllProducts(name,categoryId, sizeVariant, minPrice, maxPrice, page, size));
         return apiResponse;
     }
 
@@ -78,15 +84,15 @@ public class ProductController {
 
     }
 
-    @GetMapping("/select/{cateId}")
-    public ApiResponse<Page<ProductDTO>> selectProductByCateId(@PathVariable Long cateId,
-                                                               @RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "6") int size) {
-
-        ApiResponse<Page<ProductDTO>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(productService.searchProductByCateId(cateId, page, size));
-        return apiResponse;
-    }
+//    @GetMapping("/select/{cateId}")
+//    public ApiResponse<Page<ProductDTO>> selectProductByCateId(@PathVariable Long cateId,
+//                                                               @RequestParam(defaultValue = "0") int page,
+//                                                               @RequestParam(defaultValue = "6") int size) {
+//
+//        ApiResponse<Page<ProductDTO>> apiResponse = new ApiResponse<>();
+//        apiResponse.setData(productService.searchProductByCateId(cateId, page, size));
+//        return apiResponse;
+//    }
 
     @GetMapping("{productId}")
     public ApiResponse<ProductDTO> getProduct(@PathVariable Long productId) {

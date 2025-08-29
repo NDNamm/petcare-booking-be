@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,17 +41,12 @@ public class ProductServiceImpl implements ProductService {
     private final VariantRepository variantRepository;
 
     @Override
-    public Page<ProductDTO> getAllProducts(String name, int page, int size) {
+    public Page<ProductDTO> getAllProducts(String name, Long categoryId, String sizeVariant
+            , BigDecimal minPrice, BigDecimal maxPrice, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Product> products;
-
-        if (name == null || name.trim().isEmpty()) {
-            products = productRepository.findAll(pageable);
-        } else {
-            products = productRepository.findByNameProContainingIgnoreCase(name, pageable);
-        }
-
-        return getProduct(products);
+        products = productRepository.searchProducts(name, categoryId, sizeVariant, minPrice, maxPrice, pageable);
+        return getProduct(products, sizeVariant, minPrice, maxPrice);
     }
 
     @Override
@@ -162,13 +158,13 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    @Override
-    public Page<ProductDTO> searchProductByCateId(Long cateId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<Product> products = productRepository.findProductsByCategoryId(cateId, pageable);
-
-        return getProduct(products);
-    }
+//    @Override
+//    public Page<ProductDTO> searchProductByCateId(Long cateId, int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+//        Page<Product> products = productRepository.findProductsByCategoryId(cateId, pageable);
+//
+//        return getProduct(products);
+//    }
 
     @Override
     public ProductDTO getProductById(Long id) {
@@ -177,26 +173,34 @@ public class ProductServiceImpl implements ProductService {
         return convertProduct(product);
     }
 
-    private Page<ProductDTO> getProduct(Page<Product> products) {
+    private Page<ProductDTO> getProduct(Page<Product> products,
+                                        String sizeVariant,
+                                        BigDecimal minPrice,
+                                        BigDecimal maxPrice) {
         return products.map(product -> {
             List<ImagesDTO> imageDTOs = toImageDTOs(product.getImages());
 
-            List<VariantDTO> variants = variantRepository.findByProduct(product).stream().map(
-                    item -> {
-                        return VariantDTO
-                                .builder()
-                                .id(item.getId())
-                                .productId(item.getProduct().getId())
-                                .size(item.getSize())
-                                .price(item.getPrice())
-                                .stock(item.getStock())
-                                .build();
-                    }
-            ).toList();
+            List<VariantDTO> variants = variantRepository.findByProduct(product).stream()
+                    .filter(v -> sizeVariant == null || v.getSize().equals(sizeVariant))
+                    .filter(v -> minPrice == null || v.getPrice().compareTo(minPrice) >= 0)
+                    .filter(v -> maxPrice == null || v.getPrice().compareTo(maxPrice) <= 0)
+                    .map(
+                            item -> {
+                                return VariantDTO
+                                        .builder()
+                                        .id(item.getId())
+                                        .productId(item.getProduct().getId())
+                                        .size(item.getSize())
+                                        .price(item.getPrice())
+                                        .stock(item.getStock())
+                                        .build();
+                            }
+                    ).toList();
+            BigDecimal price = variants.isEmpty() ? null : variants.get(0).getPrice();
             return ProductDTO.builder()
                     .id(product.getId())
                     .namePro(product.getNamePro())
-                    .price(variants.get(0).getPrice())
+                    .price(price)
                     .description(product.getDescription())
                     .status(product.getStatus())
                     .slug(product.getSlug())
