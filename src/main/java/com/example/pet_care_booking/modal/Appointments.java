@@ -2,11 +2,12 @@ package com.example.pet_care_booking.modal;
 
 import com.example.pet_care_booking.modal.enums.PetGender;
 import com.example.pet_care_booking.modal.enums.PetType;
-import com.example.pet_care_booking.modal.enums.Status;
+import com.example.pet_care_booking.modal.enums.AppointStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -50,7 +51,7 @@ public class Appointments {
 
    @Column(name = "status")
    @Enumerated(EnumType.STRING)
-   private Status status;
+   private AppointStatus appointStatus;
 
    @Column(name = "note")
    private String note;
@@ -60,6 +61,9 @@ public class Appointments {
 
    @Column(name = "appointment_time")
    private Time appointmentTime;
+
+   @Column(name = "total_price")
+   private BigDecimal totalPrice;
 
    @Column(name = "created_at")
    private LocalDateTime createdAt;
@@ -77,7 +81,7 @@ public class Appointments {
    @JoinColumn(name = "user_id")
    private User user;
 
-   @ManyToMany(cascade = CascadeType.PERSIST)
+   @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
    @JoinTable(
           name = "pet_examination",
           joinColumns = @JoinColumn(name = "appointment_id"),
