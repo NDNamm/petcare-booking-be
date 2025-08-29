@@ -33,4 +33,5 @@ public class ProductDTO {
     private Long categoryId;
     private String categoryName;
     private Double averageRating;
+    private List<VariantDTO> variants;
 }

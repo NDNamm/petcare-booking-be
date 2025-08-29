@@ -1,6 +1,7 @@
 package com.example.pet_care_booking.repository;
 
 import com.example.pet_care_booking.modal.Order;
+import com.example.pet_care_booking.modal.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,16 +28,20 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    );
 
 
-   @Query("SELECT o FROM Order o WHERE o.user.userName = :userName AND (:status IS NULL OR LOWER(o.status) = LOWER(:status))")
+   @Query("SELECT o FROM Order o WHERE o.user.userName = :userName " +
+           "AND (:status IS NULL OR " +
+           "LOWER(o.status) like LOWER(concat('%',:status,'%')))")
    Page<Order> findOrdersByUser(
           @Param("userName") String userName,
           @Param("status") String status,
           Pageable pageable);
 
-   @Query("SELECT o FROM Order o WHERE o.sessionId = :sessionId AND (:status IS NULL OR LOWER(o.status) = LOWER(:status))")
+   @Query("SELECT o FROM Order o WHERE o.sessionId = :sessionId AND (:status IS NULL OR LOWER(o.status) like concat('%',:status,'%'))")
    Page<Order> findOrdersBySession(
           @Param("sessionId") String sessionId,
           @Param("status") String status,
           Pageable pageable);
+
+
 
 }

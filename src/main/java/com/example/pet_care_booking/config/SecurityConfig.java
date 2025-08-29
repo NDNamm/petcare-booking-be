@@ -43,7 +43,7 @@ public class SecurityConfig {
                   // Admin only - more specific rules
                   .requestMatchers("/api/admin/**", "/api/category/").hasRole("ADMIN")
                   .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")
-
+                    .requestMatchers("/api/variant/**").hasAnyRole("ADMIN")
                   // Any other API requests need authentication
                   .anyRequest().authenticated())
 

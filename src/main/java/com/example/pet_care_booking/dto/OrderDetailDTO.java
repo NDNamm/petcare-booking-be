@@ -13,5 +13,6 @@ public class OrderDetailDTO {
    private BigDecimal price;
    private String productName;
    private BigDecimal totalPrice;
+   private String size;
    private String urlProductImage;
 }

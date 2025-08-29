@@ -2,6 +2,7 @@ package com.example.pet_care_booking.service.impl;
 
 import com.example.pet_care_booking.dto.ImagesDTO;
 import com.example.pet_care_booking.dto.ProductDTO;
+import com.example.pet_care_booking.dto.VariantDTO;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
 import com.example.pet_care_booking.modal.Categories;
@@ -10,8 +11,10 @@ import com.example.pet_care_booking.modal.Product;
 import com.example.pet_care_booking.modal.enums.ProductStatus;
 import com.example.pet_care_booking.repository.CategoriesRepository;
 import com.example.pet_care_booking.repository.ProductRepository;
+import com.example.pet_care_booking.repository.VariantRepository;
 import com.example.pet_care_booking.service.ImageService;
 import com.example.pet_care_booking.service.ProductService;
+import com.example.pet_care_booking.service.VariantService;
 import com.github.slugify.Slugify;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +36,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ImageService imageService;
     private final CategoriesRepository categoriesRepository;
+    private final VariantService variantService;
+    private final VariantRepository variantRepository;
 
     @Override
     public Page<ProductDTO> getAllProducts(String name, int page, int size) {
@@ -54,27 +59,30 @@ public class ProductServiceImpl implements ProductService {
             throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
         }
         Slugify slugify = new Slugify();
-        String convertSlug = slugify.slugify(dto.getSlug());
+        String convertSlug = slugify.slugify(dto.getNamePro());
         Categories categories = categoriesRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         try {
-
             Product product = Product.builder()
                     .namePro(dto.getNamePro())
                     .description(dto.getDescription())
-                    .price(dto.getPrice())
+//                    .price(dto.getPrice())
                     .status(ProductStatus.AVAILABLE)
-                    .sl(dto.getSl())
+//                    .sl(dto.getSl())
                     .slug(convertSlug)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .category(categories)
                     .build();
             productRepository.save(product);
-
+            if (dto.getVariants() != null && !dto.getVariants().isEmpty()) {
+                dto.getVariants().forEach(variant -> {
+                    variant.setProductId(product.getId());
+                    variantService.createVariant(variant);
+                });
+            }
             List<Images> images = imageService.uploadProduct(image, dto.getNamePro(), product);
             String imageUrl = images.get(0).getImageUrl();
-
             product.setImageUrl(imageUrl);
             product.setImages(images);
             Product product1 = productRepository.save(product);
@@ -88,7 +96,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO updateProduct(Long id, ProductDTO dto, MultipartFile[] image) {
-
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
@@ -100,26 +107,34 @@ public class ProductServiceImpl implements ProductService {
 
         try {
             product.setNamePro(dto.getNamePro());
-            product.setPrice(dto.getPrice());
+//            product.setPrice(dto.getPrice());
             product.setDescription(dto.getDescription());
             product.setUpdatedAt(LocalDateTime.now());
-            product.setSl(dto.getSl());
+//            product.setSl(dto.getSl());
             if (dto.getStatus() != null) {
                 product.setStatus(dto.getStatus());
             }
-            // Nếu có ảnh mới thì mới xóa ảnh cũ và upload ảnh mới
             if (image != null && image.length > 0) {
                 imageService.deleteOldImages(product);
-                // Upload ảnh mới
                 List<Images> newImages = imageService.uploadProduct(image, dto.getNamePro(), product);
                 product.getImages().clear();
                 product.getImages().addAll(newImages);
                 product.setImageUrl(newImages.get(0).getImageUrl());
             }
 
-            if (product.getSl() <= 0) {
+            if (variantRepository.sumByStockAndProduct(product) <= 0) {
                 product.setStatus(ProductStatus.OUT_OF_STOCK);
             }
+            if (dto.getVariants() != null) {
+                for (VariantDTO variant : dto.getVariants()) {
+                    if (variant.getId() == null) {
+                        variantService.createVariant(variant);
+                    } else {
+                        variantService.updateVariant(variant.getId(), variant);
+                    }
+                }
+            }
+
             Product product1 = productRepository.save(product);
             return convertProduct(product1);
         } catch (IOException e) {
@@ -159,21 +174,33 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-
         return convertProduct(product);
     }
 
     private Page<ProductDTO> getProduct(Page<Product> products) {
         return products.map(product -> {
             List<ImagesDTO> imageDTOs = toImageDTOs(product.getImages());
+
+            List<VariantDTO> variants = variantRepository.findByProduct(product).stream().map(
+                    item -> {
+                        return VariantDTO
+                                .builder()
+                                .id(item.getId())
+                                .productId(item.getProduct().getId())
+                                .size(item.getSize())
+                                .price(item.getPrice())
+                                .stock(item.getStock())
+                                .build();
+                    }
+            ).toList();
             return ProductDTO.builder()
                     .id(product.getId())
                     .namePro(product.getNamePro())
-                    .price(product.getPrice())
+                    .price(variants.get(0).getPrice())
                     .description(product.getDescription())
                     .status(product.getStatus())
                     .slug(product.getSlug())
-                    .sl(product.getSl())
+                    .sl(variantRepository.sumByStockAndProduct(product))
                     .averageRating(product.getAverageRating())
                     .createdAt(product.getCreatedAt().toString())
                     .updatedAt(product.getUpdatedAt().toString())
@@ -181,6 +208,7 @@ public class ProductServiceImpl implements ProductService {
                     .imageUrl(imageDTOs.stream().findFirst().map(ImagesDTO::getImageUrl).orElse(null))
                     .imagesDTO(imageDTOs)
                     .categoryId(product.getCategory().getId())
+                    .variants(variants)
                     .build();
         });
     }
@@ -199,12 +227,23 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductDTO convertProduct(Product product) {
         List<ImagesDTO> imageDTOs = toImageDTOs(product.getImages());
+        List<VariantDTO> variants = variantRepository.findByProduct(product).stream().map(item -> {
+            return VariantDTO.builder()
+                    .id(item.getId())
+                    .productId(item.getProduct().getId())
+                    .size(item.getSize())
+                    .price(item.getPrice())
+                    .stock(item.getStock())
+                    .build();
+
+        }).toList();
         return ProductDTO.builder()
                 .id(product.getId())
                 .namePro(product.getNamePro())
                 .imageUrl(product.getImageUrl())
-                .price(product.getPrice())
-                .sl(product.getSl())
+//                .price(product.getPrice())
+//                .sl(product.getSl())
+                .variants(variants)
                 .categoryName(product.getCategory().getNameCate())
                 .description(product.getDescription())
                 .status(product.getStatus())
