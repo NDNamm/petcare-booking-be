@@ -5,9 +5,11 @@ import com.example.pet_care_booking.dto.ExaminationDTO;
 import com.example.pet_care_booking.service.ExaminationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.math.BigDecimal;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -17,9 +19,13 @@ public class ExaminationController {
    private final ExaminationService examinationService;
 
    @GetMapping("")
-   public ApiResponse<List<ExaminationDTO>> getAllUsers() {
-      ApiResponse<List<ExaminationDTO>> apiResponse = new ApiResponse<>();
-      apiResponse.setData(examinationService.getAllExaminations());
+   public ApiResponse<Page<ExaminationDTO>> getAllUsers( @RequestParam(required = false) String name,
+                                                         @RequestParam(required = false) BigDecimal  min,
+                                                         @RequestParam(required = false) BigDecimal max,
+                                                         @RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "10") int size) {
+      ApiResponse<Page<ExaminationDTO>> apiResponse = new ApiResponse<>();
+      apiResponse.setData(examinationService.getAllExaminations(name, min , max ,page, size));
       return apiResponse;
    }
 
@@ -33,7 +39,7 @@ public class ExaminationController {
 
    @PutMapping("/update/{id}")
    public ApiResponse<ExaminationDTO> updateUser(@PathVariable Long id,
-                                          @RequestBody ExaminationDTO examinationDTO) {
+                                                 @RequestBody ExaminationDTO examinationDTO) {
       ApiResponse<ExaminationDTO> apiResponse = new ApiResponse<>();
       apiResponse.setData(examinationService.updateExamination(id, examinationDTO));
       apiResponse.setMessage("Update Examination thành cong");

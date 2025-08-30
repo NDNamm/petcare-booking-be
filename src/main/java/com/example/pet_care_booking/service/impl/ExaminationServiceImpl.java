@@ -7,10 +7,14 @@ import com.example.pet_care_booking.modal.Examination;
 import com.example.pet_care_booking.repository.ExaminationRepository;
 import com.example.pet_care_booking.service.ExaminationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 @Service
@@ -20,10 +24,17 @@ public class ExaminationServiceImpl implements ExaminationService {
    private final ExaminationRepository examinationRepository;
 
    @Override
-   public List<ExaminationDTO> getAllExaminations() {
-      List<Examination> list = examinationRepository.findAll();
+   public Page<ExaminationDTO> getAllExaminations(String name, BigDecimal min , BigDecimal  max, int page, int size) {
+      Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+      Page<Examination> pageEx;
 
-      return list.stream().map(
+      boolean noFilter = (name == null || name.isBlank()) && min == null && max == null;
+      pageEx = noFilter
+             ? examinationRepository.findAll(pageable)
+             : examinationRepository.searchExm(name, min, max, pageable);
+
+
+      return pageEx.map(
              listEx -> ExaminationDTO.builder()
                     .id(listEx.getId())
                     .name(listEx.getName())
@@ -31,7 +42,7 @@ public class ExaminationServiceImpl implements ExaminationService {
                     .description(listEx.getDescription())
                     .createdAt(listEx.getCreatedAt())
                     .build()
-      ).toList();
+      );
    }
 
    @Override
