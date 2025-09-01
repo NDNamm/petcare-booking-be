@@ -33,6 +33,9 @@ public class Examination {
    @Column(name = "created_at")
    private LocalDateTime createdAt;
 
+   @Column(name = "updated_at")
+   private LocalDateTime updatedAt;
+
    @ManyToMany(mappedBy = "examination")
    @JsonIgnore
    private List<Appointments> appointments;

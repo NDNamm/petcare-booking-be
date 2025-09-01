@@ -28,7 +28,10 @@ public class ExaminationServiceImpl implements ExaminationService {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
       Page<Examination> pageEx;
 
-      boolean noFilter = (name == null || name.isBlank()) && min == null && max == null;
+      boolean noFilter = (name == null || name.isBlank())
+             && (min == null || min.compareTo(BigDecimal.ZERO) == 0)
+             && (max == null || max.compareTo(BigDecimal.ZERO) == 0);
+
       pageEx = noFilter
              ? examinationRepository.findAll(pageable)
              : examinationRepository.searchExm(name, min, max, pageable);
@@ -41,6 +44,7 @@ public class ExaminationServiceImpl implements ExaminationService {
                     .price(listEx.getPrice())
                     .description(listEx.getDescription())
                     .createdAt(listEx.getCreatedAt())
+                    .updatedAt(listEx.getUpdatedAt())
                     .build()
       );
    }
@@ -57,6 +61,7 @@ public class ExaminationServiceImpl implements ExaminationService {
              .price(examinationDTO.getPrice())
              .description(examinationDTO.getDescription())
              .createdAt(LocalDateTime.now())
+             .updatedAt(LocalDateTime.now())
              .build();
 
       examinationRepository.save(examination);
@@ -73,6 +78,7 @@ public class ExaminationServiceImpl implements ExaminationService {
       examination.setName(examinationDTO.getName());
       examination.setPrice(examinationDTO.getPrice());
       examination.setDescription(examinationDTO.getDescription());
+      examination.setUpdatedAt(LocalDateTime.now());
       examinationRepository.save(examination);
 
       return getExamination(examination);
@@ -92,6 +98,8 @@ public class ExaminationServiceImpl implements ExaminationService {
              .name(ex.getName())
              .price(ex.getPrice())
              .description(ex.getDescription())
+             .createdAt(ex.getCreatedAt())
+             .updatedAt(ex.getUpdatedAt())
              .build();
    }
 }

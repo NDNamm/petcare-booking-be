@@ -14,5 +14,5 @@ public class ExaminationDTO {
    private BigDecimal price;
    private String description;
    private LocalDateTime createdAt;
-
+   private LocalDateTime updatedAt;
 }
