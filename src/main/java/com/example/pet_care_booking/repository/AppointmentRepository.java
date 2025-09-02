@@ -19,7 +19,7 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
           AND (:email IS NULL OR LOWER(a.email) LIKE LOWER(CONCAT('%', :email, '%')))
           AND (:petName IS NULL OR LOWER(a.petName) LIKE LOWER(CONCAT('%', :petName, '%')))
           AND (:vetName IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :vetName, '%')))
-          AND (:status IS NULL OR a.appointStatus = :status)
+         AND (:status IS NULL OR LOWER(a.appointStatus) LIKE LOWER(CONCAT('%', :status, '%')))
           """)
    Page<Appointments> searchAppointment(@Param("ownerName") String ownerName,
                                         @Param("phoneNumber") String phoneNumber,
@@ -32,7 +32,7 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
    @Query("""
           Select a from Appointments a
           where :userName = a.user.userName
-          and (:status is null or a.appointStatus = :status)
+          AND (:status IS NULL OR LOWER(a.appointStatus) LIKE LOWER(CONCAT('%', :status, '%')))
           """)
    Page<Appointments> searchAppointmentsByUser(@Param("userName") String userName,
                                                @Param("status") String status,
@@ -41,7 +41,7 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
    @Query("""
           Select a from Appointments a
           where :sessionId = a.sessionId
-          and (:status is null or a.appointStatus = :status)
+          AND (:status IS NULL OR LOWER(a.appointStatus) LIKE LOWER(CONCAT('%', :status, '%')))
           """)
    Page<Appointments> searchAppointmentsBySessionId(@Param("sessionId") String sessionId,
                                                     @Param("status") String status,

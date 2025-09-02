@@ -32,13 +32,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
    @Override
    public Page<AppointmentsDTO> getAppointments(String ownerName, String phoneNumber, String email,
-                                                String namePet, String nameVet, String status,
+                                                String petName, String vetName, String status,
                                                 int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
       Page<Appointments> apps = (ownerName == null && phoneNumber == null &&
-             email == null && namePet == null && nameVet == null)
+             email == null && petName == null && vetName == null && status == null)
              ? appointmentRepository.findAll(pageable)
-             : appointmentRepository.searchAppointment(ownerName, phoneNumber, email, namePet, nameVet, status, pageable);
+             : appointmentRepository.searchAppointment(ownerName, phoneNumber, email, petName, vetName, status, pageable);
 
       return apps.map(this::getAppointment);
    }

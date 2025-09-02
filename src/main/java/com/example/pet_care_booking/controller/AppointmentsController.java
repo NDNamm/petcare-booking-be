@@ -21,15 +21,15 @@ public class AppointmentsController {
    //Admin
    @GetMapping("")
    public ApiResponse<Page<AppointmentsDTO>> getAllAppointments(@RequestParam(required = false) String ownerName,
-                                                                @RequestParam(required = false) String email,
                                                                 @RequestParam(required = false) String phoneNumber,
-                                                                @RequestParam(required = false) String namePet,
-                                                                @RequestParam(required = false) String nameVet,
+                                                                @RequestParam(required = false) String email,
+                                                                @RequestParam(required = false) String petName,
+                                                                @RequestParam(required = false) String vetName,
                                                                 @RequestParam(required = false) String status,
                                                                 @RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "10") int size) {
       ApiResponse<Page<AppointmentsDTO>> apiResponse = new ApiResponse<>();
-      apiResponse.setData(appointmentService.getAppointments(ownerName, email, phoneNumber, namePet, nameVet, status, page, size));
+      apiResponse.setData(appointmentService.getAppointments(ownerName, phoneNumber, email, petName, vetName, status, page, size));
       return apiResponse;
    }
 
