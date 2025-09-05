@@ -39,7 +39,7 @@ public class VeterinarianController {
                                           @RequestBody VeterinariansDTO vet) {
       ApiResponse<VeterinariansDTO> apiResponse = new ApiResponse<>();
       apiResponse.setData(veterinarianService.updateVet(id,vet));
-      apiResponse.setMessage("Update veterinarian thành cong");
+      apiResponse.setMessage("Update veterinarian thành công");
       return apiResponse;
    }
 

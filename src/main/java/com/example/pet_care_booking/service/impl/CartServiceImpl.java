@@ -260,7 +260,7 @@ public class CartServiceImpl implements CartService {
         CartItem cartItem;
         Long addedQuantity = cartItemDTO.getQuantity();
         BigDecimal price = variant.getPrice();
-        if (existingItem.isPresent()) {
+            if (existingItem.isPresent()) {
             cartItem = existingItem.get();
             long newQuantity = cartItem.getQuantity() + cartItemDTO.getQuantity();
             cartItem.setQuantity(newQuantity);

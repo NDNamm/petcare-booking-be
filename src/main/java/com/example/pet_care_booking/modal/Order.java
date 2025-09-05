@@ -36,9 +36,10 @@ public class Order {
    @Column(name = "order_date")
    private LocalDateTime orderDate;
 
-   @Column(name = "status")
-   @Enumerated(EnumType.STRING)
-   private OrderStatus status;
+       @Column(name = "status")
+       @Enumerated(EnumType.STRING)
+
+       private OrderStatus status;
 
    @Column(name = "note")
    private String note;

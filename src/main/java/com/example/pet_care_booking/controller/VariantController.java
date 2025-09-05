@@ -19,7 +19,7 @@ public class VariantController {
 //        return ResponseEntity.ok(variantService.updateVariant(id, variantDTO));
 //    }
 
-    @DeleteMapping("/delete/:id")
+    @DeleteMapping("/delete/{id}")
     private ResponseEntity<Void> updateVariant(@PathVariable Long id) {
         variantService.deleteVariant(id);
         return ResponseEntity.ok().build();

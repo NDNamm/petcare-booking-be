@@ -25,7 +25,7 @@ public class OrderController {
                                                    @RequestParam(required = false) String phoneNumber,
                                                    @RequestParam(required = false)String status,
                                                    @RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam(defaultValue = "10") int size) {
+                                                   @RequestParam(defaultValue = "4") int size) {
       ApiResponse<Page<OrderDTO>> apiResponse = new ApiResponse<>();
       apiResponse.setData(orderService.getAllOrders(name, phoneNumber, status, page, size));
       return apiResponse;
