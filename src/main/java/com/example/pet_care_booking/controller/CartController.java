@@ -5,9 +5,11 @@ import com.example.pet_care_booking.dto.CartDTO;
 import com.example.pet_care_booking.dto.CartItemDTO;
 import com.example.pet_care_booking.service.CartService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("api/cart")
 @RequiredArgsConstructor
@@ -20,7 +22,6 @@ public class CartController {
       String email = SecurityContextHolder.getContext().getAuthentication().getName();
       ApiResponse<CartDTO> apiResponse = new ApiResponse<>();
       apiResponse.setData(cartService.getCartByUser(email));
-
       return apiResponse;
    }
 

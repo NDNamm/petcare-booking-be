@@ -8,10 +8,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,4 +53,21 @@ public class AuthController {
       response.setData(authService.refresh(req, res));
       return response;
    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status((HttpStatus.UNAUTHORIZED)).body("Unauthorized");
+        }
+        String username = authentication.getName();
+        String role = authentication.getAuthorities()
+                .stream().findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("USER");
+
+        return ResponseEntity.ok(Map.of(
+                "username", username,
+                "role", role
+        ));
+    }
 }
