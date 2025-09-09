@@ -33,11 +33,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-   private final OrderRepository orderRepository;
-   private final UserRepository userRepository;
-   private final CartRepository cartRepository;
-   private final ProductRepository productRepository;
-   private final VariantRepository variantRepository;
+    private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
+    private final VariantRepository variantRepository;
 
     @Override
     public Page<OrderDTO> getAllOrders(String name, String phoneNumber, String status, int page, int size) {
@@ -114,27 +114,33 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.NOT_FOUND);
         }
 
-      if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
-         throw new AppException(ErrorCode.CART_NOT_FOUND);
-      }
+//        if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
+//            throw new AppException(ErrorCode.CART_NOT_FOUND);
+//        } else {
+//
+//        }
 
-      String name = user != null ? user.getUserName() : orderDTO.getFullName();
-      String phone = user != null ? user.getPhoneNumber() : orderDTO.getPhoneNumber();
+        String name = user != null ? user.getUserName() : orderDTO.getFullName();
+        String phone = user != null ? user.getPhoneNumber() : orderDTO.getPhoneNumber();
+        BigDecimal totalAmount;
+        if (orderDTO.getItems() == null) {
+            totalAmount = cart.getItems().stream()
+                    .map(CartItem::getTotalPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }else{
+            totalAmount = orderDTO.getItems().get(0).getPrice();
+        }
 
-      BigDecimal totalAmount = cart.getItems().stream()
-             .map(CartItem::getTotalPrice)
-             .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-      Order order = Order.builder()
-             .user(user)
-             .sessionId(user == null ? sessionId : null)
-             .name(name)
-             .phoneNumber(phone)
-             .orderDate(LocalDateTime.now())
-             .totalAmount(totalAmount)
-             .status(OrderStatus.PENDING)
-             .note(orderDTO.getNote())
-             .build();
+        Order order = Order.builder()
+                .user(user)
+                .sessionId(user == null ? sessionId : null)
+                .name(name)
+                .phoneNumber(phone)
+                .orderDate(LocalDateTime.now())
+                .totalAmount(totalAmount)
+                .status(OrderStatus.PENDING)
+                .note(orderDTO.getNote())
+                .build();
 
         List<OrderDetail> orderDetail = buildOrderDetails(order, cart, orderDTO.getItems());
         order.setOrderDetail(orderDetail);
@@ -167,18 +173,19 @@ public class OrderServiceImpl implements OrderService {
 
 
     }
+
     private List<OrderDetail> buildOrderDetails(Order order, Cart cart, List<ItemDTO> itemDTOs) {
         List<OrderDetail> orderDetails = new ArrayList<>();
 
-      if (cart != null && !cart.getItems().isEmpty()) {
-         for (CartItem cartItem : cart.getItems()) {
-            Product product = productRepository.findById(cartItem.getProduct().getId())
-                   .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-            Variants variant = cartItem.getVariant();
-            if (variant.getStock() < cartItem.getQuantity()) {
-               throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-            }
-            variant.setStock(variant.getStock() - cartItem.getQuantity());
+        if (cart != null && !cart.getItems().isEmpty()) {
+            for (CartItem cartItem : cart.getItems()) {
+                Product product = productRepository.findById(cartItem.getProduct().getId())
+                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+                Variants variant = cartItem.getVariant();
+                if (variant.getStock() < cartItem.getQuantity()) {
+                    throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+                }
+                variant.setStock(variant.getStock() - cartItem.getQuantity());
 
                 if (!product.getStatus().equals(ProductStatus.AVAILABLE)) {
                     throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
@@ -189,14 +196,14 @@ public class OrderServiceImpl implements OrderService {
 //                }
 
 
-            OrderDetail orderDetail = OrderDetail.builder()
-                   .order(order)
-                   .product(product)
-                   .variant(variant)
-                   .quantity(cartItem.getQuantity())
-                   .price(cartItem.getPrice())
-                   .totalPrice(cartItem.getTotalPrice())
-                   .build();
+                OrderDetail orderDetail = OrderDetail.builder()
+                        .order(order)
+                        .product(product)
+                        .variant(variant)
+                        .quantity(cartItem.getQuantity())
+                        .price(cartItem.getPrice())
+                        .totalPrice(cartItem.getTotalPrice())
+                        .build();
 
                 orderDetails.add(orderDetail);
             }
@@ -210,7 +217,8 @@ public class OrderServiceImpl implements OrderService {
                     throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
                 }
                 Optional<Variants> variants = variantRepository.findBySizeAndProduct(dto.getSize(), product);
-                if(variants.isEmpty()) throw new EntityNotFoundException("Not found variant with size and productId " +  product.getId());
+                if (variants.isEmpty())
+                    throw new EntityNotFoundException("Not found variant with size and productId " + product.getId());
                 if (variants.get().getStock() < dto.getQuantity()) {
                     throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
                 }
@@ -233,6 +241,7 @@ public class OrderServiceImpl implements OrderService {
 
         return orderDetails;
     }
+
     @Override
     public Page<OrderDTO> getOrderClient(String userName, String sessionId, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("orderDate").descending());
@@ -315,7 +324,6 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderDetailDTOS;
     }
-
 
 
     private void validateOrderOwnership(Order order, String userName, String sessionId) {
