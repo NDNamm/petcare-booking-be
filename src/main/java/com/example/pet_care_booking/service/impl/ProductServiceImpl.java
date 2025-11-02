@@ -16,6 +16,7 @@ import com.example.pet_care_booking.service.ImageService;
 import com.example.pet_care_booking.service.ProductService;
 import com.example.pet_care_booking.service.VariantService;
 import com.github.slugify.Slugify;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDTO addProduct(Long id, ProductDTO dto, MultipartFile[] image) {
         if (productRepository.existsByNamePro(dto.getNamePro())) {
             throw new AppException(ErrorCode.PRODUCT_NAME_EXISTED);
@@ -81,10 +84,8 @@ public class ProductServiceImpl implements ProductService {
             String imageUrl = images.get(0).getImageUrl();
             product.setImageUrl(imageUrl);
             product.setImages(images);
-            Product product1 = productRepository.save(product);
-
-            return convertProduct(product1);
-        } catch (IOException e) {
+            return convertProduct(product);
+        } catch (Exception e) {
             throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);
         }
 
@@ -196,7 +197,12 @@ public class ProductServiceImpl implements ProductService {
                                         .build();
                             }
                     ).toList();
-            BigDecimal price = variants.isEmpty() ? null : variants.get(0).getPrice();
+            BigDecimal price = new BigDecimal(0);
+            if(!variants.isEmpty()) {
+                 price = variants.get(0).getPrice();
+            }else{
+                variants = new ArrayList<>();
+            }
             return ProductDTO.builder()
                     .id(product.getId())
                     .namePro(product.getNamePro())
@@ -204,11 +210,11 @@ public class ProductServiceImpl implements ProductService {
                     .description(product.getDescription())
                     .status(product.getStatus())
                     .slug(product.getSlug())
-                    .sl(variantRepository.sumByStockAndProduct(product))
+                    .sl(variantRepository.sumByStockAndProduct(product) > 0 ? variantRepository.sumByStockAndProduct(product) : 0)
                     .averageRating(product.getAverageRating())
                     .createdAt(product.getCreatedAt().toString())
                     .updatedAt(product.getUpdatedAt().toString())
-                    .averageRating(product.getAverageRating())
+//                    .averageRating(product.getAverageRating() > 0 ? product.getAverageRating() : 0)
                     .imageUrl(imageDTOs.stream().findFirst().map(ImagesDTO::getImageUrl).orElse(null))
                     .imagesDTO(imageDTOs)
                     .categoryId(product.getCategory().getId())
