@@ -12,7 +12,10 @@ public class OrderDetailDTO {
    private Long quantity;
    private BigDecimal price;
    private String productName;
+   private Long productId;
    private BigDecimal totalPrice;
    private String size;
    private String urlProductImage;
+   private boolean reviewed;
+   private Long variantId;
 }

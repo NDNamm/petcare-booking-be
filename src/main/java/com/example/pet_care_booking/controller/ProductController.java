@@ -27,11 +27,10 @@ public class ProductController {
                                                        @RequestParam(name = "size", required = false) String sizeVariant,
                                                        @RequestParam(required = false) BigDecimal minPrice,
                                                        @RequestParam(required = false) BigDecimal maxPrice,
-                                                       @RequestParam(defaultValue = "0") int page)
-                                                        {
+                                                       @RequestParam(defaultValue = "0") int page) {
 
         ApiResponse<Page<ProductDTO>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(productService.getAllProducts(name,categoryId, sizeVariant, minPrice, maxPrice, page, 6));
+        apiResponse.setData(productService.getAllProducts(name, categoryId, sizeVariant, minPrice, maxPrice, page, 6));
         return apiResponse;
     }
 

@@ -34,7 +34,7 @@ public class SecurityConfig {
                   .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history","/api/appointment/history",
                         "/api/orderDetail/**", "/api/examination/**", "/api/vet/**")
                   .permitAll()
-                  .requestMatchers("/api/cart/session/**", "/api/order/**").permitAll()
+                  .requestMatchers("/api/cart/session/**", "/api/order/**", "/api/order/cancel/*").permitAll()
 
                   // Rating GET public, nhưng POST/PUT/DELETE cần login
                   .requestMatchers(HttpMethod.GET, "/api/rating/**").permitAll()

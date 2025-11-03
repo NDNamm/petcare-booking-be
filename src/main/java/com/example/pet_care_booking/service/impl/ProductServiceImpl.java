@@ -11,6 +11,7 @@ import com.example.pet_care_booking.modal.Product;
 import com.example.pet_care_booking.modal.enums.ProductStatus;
 import com.example.pet_care_booking.repository.CategoriesRepository;
 import com.example.pet_care_booking.repository.ProductRepository;
+import com.example.pet_care_booking.repository.ProductReviewRepository;
 import com.example.pet_care_booking.repository.VariantRepository;
 import com.example.pet_care_booking.service.ImageService;
 import com.example.pet_care_booking.service.ProductService;
@@ -41,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoriesRepository categoriesRepository;
     private final VariantService variantService;
     private final VariantRepository variantRepository;
+    private final ProductReviewRepository productReviewRepository;
 
     @Override
     public Page<ProductDTO> getAllProducts(String name, Long categoryId, String sizeVariant
@@ -203,15 +205,20 @@ public class ProductServiceImpl implements ProductService {
             }else{
                 variants = new ArrayList<>();
             }
+            Double averageRating = productReviewRepository.averageProductReviewByProduct(product);
+            if (averageRating == null) {
+                averageRating = 0.0;
+            }
+
             return ProductDTO.builder()
                     .id(product.getId())
                     .namePro(product.getNamePro())
                     .price(price)
+                    .averageRating(averageRating)
                     .description(product.getDescription())
                     .status(product.getStatus())
                     .slug(product.getSlug())
                     .sl(variantRepository.sumByStockAndProduct(product) > 0 ? variantRepository.sumByStockAndProduct(product) : 0)
-                    .averageRating(product.getAverageRating())
                     .createdAt(product.getCreatedAt().toString())
                     .updatedAt(product.getUpdatedAt().toString())
 //                    .averageRating(product.getAverageRating() > 0 ? product.getAverageRating() : 0)
@@ -247,17 +254,22 @@ public class ProductServiceImpl implements ProductService {
                     .build();
 
         }).toList();
+
+        Double averageRating = productReviewRepository.averageProductReviewByProduct(product);
+        if (averageRating == null) {
+            averageRating = 0.0;
+        }
         return ProductDTO.builder()
                 .id(product.getId())
                 .namePro(product.getNamePro())
                 .imageUrl(product.getImageUrl())
 //                .price(product.getPrice())
 //                .sl(product.getSl())
+                .averageRating(averageRating)
                 .variants(variants)
                 .categoryName(product.getCategory().getNameCate())
                 .description(product.getDescription())
                 .status(product.getStatus())
-                .averageRating(product.getAverageRating())
                 .createdAt(product.getCreatedAt().toString())
                 .updatedAt(product.getUpdatedAt().toString())
                 .imagesDTO(imageDTOs)

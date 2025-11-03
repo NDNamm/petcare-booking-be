@@ -15,6 +15,7 @@ import com.example.pet_care_booking.service.OrderService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +33,10 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderServiceImpl implements OrderService {
+    private final ProductReviewRepository  productReviewRepository;
+    private final CurrentUserServiceImpl currentUserServiceImpl;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
@@ -62,6 +66,7 @@ public class OrderServiceImpl implements OrderService {
                 .phoneNumber(order.getPhoneNumber())
                 .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
+
                 .orderDetailDTO(getOrderDetailDTOS(order))
                 .addressDTO(order.getAddress() != null ? mapToAddressDTO(order.getAddress()) : null)
                 .note(order.getNote())
@@ -306,15 +311,23 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-    private static List<OrderDetailDTO> getOrderDetailDTOS(Order order) {
+    private  List<OrderDetailDTO> getOrderDetailDTOS(Order order) {
         List<OrderDetailDTO> orderDetailDTOS = new ArrayList<>();
+        User user = currentUserServiceImpl.getCurrentUser();
         if (order.getOrderDetail() != null) {
             for (OrderDetail items : order.getOrderDetail()) {
+                ProductReview productReview = productReviewRepository.findProductReviewByProductAndVariantAndUserAndOrder(items.getProduct(),
+                        items.getVariant(), user, order);
+
+
                 OrderDetailDTO dto = OrderDetailDTO.builder()
                         .id(items.getId())
                         .urlProductImage(items.getProduct().getImageUrl())
+                        .productId(items.getProduct().getId())
+                        .variantId(items.getVariant().getId())
                         .productName(items.getProduct().getNamePro())
                         .quantity(items.getQuantity())
+                        .reviewed(productReview != null)
                         .price(items.getPrice())
                         .size(items.getVariant().getSize())
                         .totalPrice(items.getTotalPrice())

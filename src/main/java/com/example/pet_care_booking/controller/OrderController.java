@@ -96,7 +96,7 @@ public class OrderController {
       if (isAnonymous && sessionId != null) {
          orderService.cancelOrder(orderId, sessionId, userName);
       } else {
-         orderService.cancelOrder(orderId, null, userName);
+         orderService.cancelOrder(orderId, userName, null);
       }
       ApiResponse<OrderDTO> apiResponse = new ApiResponse<>();
       apiResponse.setMessage("Đã hủy đơn hàng thành công");
