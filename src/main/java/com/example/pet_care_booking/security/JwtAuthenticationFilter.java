@@ -1,5 +1,6 @@
 package com.example.pet_care_booking.security;
 
+import com.example.pet_care_booking.service.impl.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,38 +21,43 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-   private final JwtUtils jwtUtils;
-   private final UserDetailsService userDetailsService;
+    private final JwtUtils jwtUtils;
+    private final UserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
-   @Override
-   protected void doFilterInternal(HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   FilterChain chain) throws IOException, ServletException {
-      String authHeader = request.getHeader("Authorization");
-      if (request.getServletPath().startsWith("/api/auth/refresh-token")) {
-         chain.doFilter(request, response);
-         return;
-      }
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws IOException, ServletException {
+        String authHeader = request.getHeader("Authorization");
+        if (request.getServletPath().startsWith("/api/auth/refresh-token")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-      if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-         chain.doFilter(request, response);
-         return;
-      }
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
 
-      String token = authHeader.substring(7);
-      String username = jwtUtils.extractUsername(token);
+        String token = authHeader.substring(7);
+        String username = jwtUtils.extractUsername(token);
+        if(tokenBlacklistService.isBlacklisted(token)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token has been revoked");
+            return;
+        }
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtUtils.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-      if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-         if (jwtUtils.validateToken(token, userDetails)) {
-            UsernamePasswordAuthenticationToken authentication =
-                   new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-         }
-      }
-          chain.doFilter(request, response);
-   }
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+        chain.doFilter(request, response);
+    }
 }

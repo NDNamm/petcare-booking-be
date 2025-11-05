@@ -17,47 +17,47 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "orders")
 public class Order {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-   @Column(name = "session_id")
-   private String sessionId;
+    @Column(name = "session_id")
+    private String sessionId;
 
-   @Column(name = "name")
-   private String name;
+    @Column(name = "name")
+    private String name;
 
-   @Column(name = "phone_number")
-   private String phoneNumber;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
-   @Column(name = "total_amount", precision = 10, scale = 2)
-   private BigDecimal totalAmount;
+    @Column(name = "total_amount", precision = 10, scale = 2)
+    private BigDecimal totalAmount;
 
-   @Column(name = "order_date")
-   private LocalDateTime orderDate;
+    @Column(name = "order_date")
+    private LocalDateTime orderDate;
 
-       @Column(name = "status")
-       @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
 
-       private OrderStatus status;
+    private OrderStatus status;
 
-   @Column(name = "note")
-   private String note;
+    @Column(name = "note")
+    private String note;
 
-   @JsonIgnore
-   @ManyToOne
-   @JoinColumn(name = "user_id")
-   private User user;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)
-   @JsonIgnore
-   private List<OrderDetail> orderDetail;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<OrderDetail> orderDetail;
 
-   @OneToOne(mappedBy = "order", cascade = CascadeType.ALL,orphanRemoval = true)
-   private Payments payment;
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Payments payment;
 
-   @OneToOne(mappedBy = "order",cascade = CascadeType.ALL, orphanRemoval = true)
-   private Address address;
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Address address;
 
 }
 

@@ -13,6 +13,7 @@ import com.example.pet_care_booking.service.ProductReviewService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     }
 
     @Override
+    @Cacheable(cacheNames = "review", key = "#slug")
     public Page<ProductReviewDTO> findByProductSlug(String slug, PageRequest pageRequest) {
         Page<ProductReview> products = productReviewRepository.findProductReviewBySlug(slug, pageRequest);
         return products.map(productReviewMapper::toDTO);

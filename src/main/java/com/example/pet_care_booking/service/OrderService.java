@@ -2,6 +2,7 @@ package com.example.pet_care_booking.service;
 
 import com.example.pet_care_booking.dto.ItemDTO;
 import com.example.pet_care_booking.dto.OrderDTO;
+import com.example.pet_care_booking.modal.Order;
 import org.springframework.data.domain.Page;
 
 public interface OrderService {
@@ -11,7 +12,7 @@ public interface OrderService {
    void deleteOrder(Long orderId);
 
    //Cua User
-   void addOrder(OrderDTO orderDTO, String userName, String sessionId);
+   Long addOrder(OrderDTO orderDTO, String userName, String sessionId);
    Page<OrderDTO> getOrderClient(String userName, String sessionId, String status, int page, int size);
    void updateOrderByClient(OrderDTO orderDTO, Long orderId, String userName, String sessionId);
    void cancelOrder(Long orderId, String userName, String sessionId);

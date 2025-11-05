@@ -15,7 +15,7 @@ public class ProductReviewMapper {
                 .productName(review.getProduct().getNamePro())
                 .comment(review.getComment())
                 .rating(review.getRating())
-                .createdAt(review.getCreatedAt())
+                .createdAt(review.getCreatedAt().toString())
                 .status(review.getStatus().toString())
                 .build();
     }

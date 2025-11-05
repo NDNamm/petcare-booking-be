@@ -4,6 +4,7 @@ import com.example.pet_care_booking.dto.AddressDTO;
 import com.example.pet_care_booking.dto.ItemDTO;
 import com.example.pet_care_booking.dto.OrderDTO;
 import com.example.pet_care_booking.dto.OrderDetailDTO;
+import com.example.pet_care_booking.enums.PaymentStatus;
 import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
 import com.example.pet_care_booking.modal.*;
@@ -11,6 +12,7 @@ import com.example.pet_care_booking.modal.enums.OrderStatus;
 import com.example.pet_care_booking.modal.enums.PaymentMethod;
 import com.example.pet_care_booking.modal.enums.ProductStatus;
 import com.example.pet_care_booking.repository.*;
+import com.example.pet_care_booking.service.CartService;
 import com.example.pet_care_booking.service.OrderService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -42,6 +44,8 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final VariantRepository variantRepository;
+    private final CartService cartService;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public Page<OrderDTO> getAllOrders(String name, String phoneNumber, String status, int page, int size) {
@@ -104,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void addOrder(OrderDTO orderDTO, String userName, String sessionId) {
+    public Long addOrder(OrderDTO orderDTO, String userName, String sessionId) {
         User user = null;
         Cart cart;
 
@@ -125,10 +129,10 @@ public class OrderServiceImpl implements OrderService {
 //
 //        }
 
-        String name = user != null ? user.getUserName() : orderDTO.getFullName();
+        String name = orderDTO.getFullName();
         String phone = user != null ? user.getPhoneNumber() : orderDTO.getPhoneNumber();
         BigDecimal totalAmount;
-        if (orderDTO.getItems() == null) {
+        if (orderDTO.getItems() != null && cart.getTotalMoney().compareTo(BigDecimal.ZERO) > 0) {
             totalAmount = cart.getItems().stream()
                     .map(CartItem::getTotalPrice)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -164,19 +168,17 @@ public class OrderServiceImpl implements OrderService {
         Payments payments = Payments.builder()
                 .amount(order.getTotalAmount())
                 .paymentDate(LocalDate.now())
+                .paymentMethod(orderDTO.getPaymentMethod() != null ? orderDTO.getPaymentMethod() : PaymentMethod.COD)
+                .paymentDate(LocalDate.now())
+                .status(orderDTO.getPaymentMethod() == null ? null : PaymentStatus.PENDING)
                 .order(order)
                 .build();
-        PaymentMethod method = PaymentMethod.COD;
-        if (method != null) {
-            payments.setPaymentMethod(method);
-        } else {
-            throw new AppException(ErrorCode.NOT_PAYMENT_METHOD);
-        }
+
         order.setPayment(payments);
-
+        paymentRepository.save(payments);
         orderRepository.save(order);
-
-
+        cartService.deleteCartByUser(userName);
+        return order.getId();
     }
 
     private List<OrderDetail> buildOrderDetails(Order order, Cart cart, List<ItemDTO> itemDTOs) {

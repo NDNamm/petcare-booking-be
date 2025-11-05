@@ -1,5 +1,6 @@
 package com.example.pet_care_booking.modal;
 
+import com.example.pet_care_booking.enums.PaymentStatus;
 import com.example.pet_care_booking.modal.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -16,23 +17,25 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payments {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-   @Column(name = "payment_date")
-   private LocalDate paymentDate;
+    @Column(name = "payment_date")
+    private LocalDate paymentDate;
+    @Column(name = "payment_status")
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+    @Column(name = "amount", precision = 10, scale = 2, nullable = false)
+    private BigDecimal amount;
 
-   @Column(name = "amount", precision = 10, scale = 2, nullable = false)
-   private BigDecimal amount;
+    @Column(name = "payment_method", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
-   @Column(name = "payment_method", nullable = false)
-   @Enumerated(EnumType.STRING)
-   private PaymentMethod paymentMethod;
-
-   @OneToOne
-   @JoinColumn(name = "order_id", unique = true)
-   @JsonIgnore
-   private Order order;
+    @OneToOne
+    @JoinColumn(name = "order_id", unique = true)
+    @JsonIgnore
+    private Order order;
 
 }

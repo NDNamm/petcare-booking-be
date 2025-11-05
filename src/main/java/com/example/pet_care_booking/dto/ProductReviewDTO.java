@@ -23,6 +23,6 @@ public class ProductReviewDTO {
     private Integer rating;
     private String comment;
     private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String createdAt;
+    private String updatedAt;
 }

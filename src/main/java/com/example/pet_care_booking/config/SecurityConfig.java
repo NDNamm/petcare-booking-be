@@ -39,7 +39,7 @@ public class SecurityConfig {
                   // Rating GET public, nhưng POST/PUT/DELETE cần login
                   .requestMatchers(HttpMethod.GET, "/api/rating/**").permitAll()
                   .requestMatchers("/api/rating/**").hasAnyRole("ADMIN", "USER")
-
+                    .requestMatchers("/api/vnpay/**").permitAll()
                   // Admin only - more specific rules
                   .requestMatchers("/api/admin/**", "/api/category/").hasRole("ADMIN")
                   .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")

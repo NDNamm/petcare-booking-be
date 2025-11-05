@@ -19,6 +19,9 @@ import com.example.pet_care_booking.service.VariantService;
 import com.github.slugify.Slugify;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +38,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -142,7 +146,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(value = "product", key = "#slug")
     public ProductDTO findBySlug(String slug) {
+        log.info("product by slug {}", slug);
         Product product = productRepository.findBySlug(slug);
         return convertProduct(product);
     }

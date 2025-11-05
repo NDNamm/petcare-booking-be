@@ -52,22 +52,15 @@ public class OrderController {
 
    //Client
    @PostMapping("/add")
-   public ApiResponse<OrderDTO> addOrder(@RequestBody OrderDTO orderDTO,
+   public Long addOrder(@RequestBody OrderDTO orderDTO,
                                          @RequestParam(required = false) String sessionId) {
       String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-      boolean isAnonymous = userName == null || userName.equals(ANONYMOUS_USER);
 
-      if (isAnonymous && sessionId != null) {
-         orderService.addOrder(orderDTO, null, sessionId);
-         cartService.deleteSession(sessionId);
-      } else {
-         orderService.addOrder(orderDTO, userName, null);
-         cartService.deleteCartByUser(userName);
-      }
+
       ApiResponse<OrderDTO> apiResponse = new ApiResponse<>();
       apiResponse.setMessage("Đã đặt hàng thành công");
 
-      return apiResponse;
+     return orderService.addOrder(orderDTO, userName, null);
    }
 
    @PutMapping("/update_client/{orderId}")
