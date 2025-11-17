@@ -1,6 +1,11 @@
 package com.example.pet_care_booking.config;
 
+import com.example.pet_care_booking.modal.User;
+import com.example.pet_care_booking.repository.UserRepository;
 import com.example.pet_care_booking.security.JwtAuthenticationFilter;
+import com.example.pet_care_booking.security.JwtUtils;
+import com.example.pet_care_booking.service.impl.CustomOidcUserService;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,8 +15,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.UUID;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -20,39 +28,57 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-   @Bean
-   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-      httpSecurity
-            .cors(withDefaults())
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                  // Public APIs
-                  .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**", "/api/appointment/add/**", "/api/product/product-details/*").permitAll()
-                  .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history","/api/appointment/history",
-                        "/api/orderDetail/**", "/api/examination/**", "/api/vet/**")
-                  .permitAll()
-                  .requestMatchers("/api/cart/session/**", "/api/order/**", "/api/order/cancel/*").permitAll()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CustomOidcUserService customOidcUserService, JwtUtils jwtUtils, UserRepository userRepository) throws Exception {
+        httpSecurity
+                .cors(withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // Public APIs
+                        .requestMatchers("/api/auth/**", "/api/payment/**", "/api/cart/**", "/api/forgot-password", "/api/reset-password", "/api/appointment/add/**", "/api/product/product-details/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/product/**", "/api/category/**", "/api/order/history", "/api/appointment/history",
+                                "/api/orderDetail/**", "/api/examination/**", "/api/vet/**")
+                        .permitAll()
+                        .requestMatchers("/api/cart/session/**", "/api/order/**", "/api/order/cancel/*").permitAll()
 
-                  // Rating GET public, nhưng POST/PUT/DELETE cần login
-                  .requestMatchers(HttpMethod.GET, "/api/rating/**").permitAll()
-                  .requestMatchers("/api/rating/**").hasAnyRole("ADMIN", "USER")
-                    .requestMatchers("/api/vnpay/**").permitAll()
-                  // Admin only - more specific rules
-                  .requestMatchers("/api/admin/**", "/api/category/").hasRole("ADMIN")
-                  .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")
+                        // Rating GET public, nhưng POST/PUT/DELETE cần login
+                        .requestMatchers(HttpMethod.GET, "/api/rating/**").permitAll()
+                        .requestMatchers("/api/rating/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/vnpay/**").permitAll()
+                        // Admin only - more specific rules
+                        .requestMatchers("/api/admin/**", "/api/category/").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")
 
-                  // Any other API requests need authentication
-                  .anyRequest().authenticated())
+                        // Any other API requests need authentication
+                        .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfor -> userInfor.oidcUserService(customOidcUserService))
+                        .successHandler((request, response, authentication) -> {
+                            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                            String email = oAuth2User.getAttribute("email");
+                            User user = userRepository.findUserByEmail(email)
+                                    .orElseThrow(() -> new IllegalArgumentException("Not found user"));
+                            String token = jwtUtils.createAccessToken(user.getUserName(), user.getRole().getName());
+                            String refreshToken = UUID.randomUUID().toString();
+                            Cookie cookie = new Cookie("refresh_token", refreshToken);
+                            cookie.setHttpOnly(true);
+                            cookie.setPath("/");
+                            cookie.setSecure(false);
+                            cookie.setMaxAge(7 * 24 * 60 * 60);
+                            response.addCookie(cookie);
+                            String redirectUrl = "http://localhost:5173/oauth2/success?token=" + token;
+                            response.sendRedirect(redirectUrl);
+                        }))
 
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-      return httpSecurity.build();
-   }
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
+    }
 
-   @Bean
-   public PasswordEncoder passwordEncoder() {
-      return new BCryptPasswordEncoder();
-   }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

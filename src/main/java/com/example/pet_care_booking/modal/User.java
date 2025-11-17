@@ -22,7 +22,7 @@ public class User {
     @Column(name = "user_name", nullable = false, unique = true)
     private String userName;
 
-    @Column(name = "phone_number", nullable = false, unique = true)
+    @Column(name = "phone_number", nullable = true, unique = true)
     private String phoneNumber;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -36,7 +36,8 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
+    @Column
+    private String provider;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "role_id")

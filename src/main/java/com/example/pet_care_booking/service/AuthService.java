@@ -10,4 +10,5 @@ public interface AuthService {
    void logout(HttpServletResponse response);
    void register(UserDTO dto);
    AuthDTO refresh(HttpServletRequest request, HttpServletResponse response);
+
 }
