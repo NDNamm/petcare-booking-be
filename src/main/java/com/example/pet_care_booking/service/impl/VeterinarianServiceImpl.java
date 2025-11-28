@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -89,7 +90,9 @@ public class VeterinarianServiceImpl implements VeterinarianService {
       veterinarianRepository.delete(vets);
    }
 
-   private VeterinariansDTO getVet(Veterinarians vet) {
+
+
+    private VeterinariansDTO getVet(Veterinarians vet) {
       return VeterinariansDTO.builder()
              .id(vet.getId())
              .name(vet.getName())

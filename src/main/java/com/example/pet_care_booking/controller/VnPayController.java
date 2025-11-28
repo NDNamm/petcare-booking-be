@@ -3,6 +3,7 @@ package com.example.pet_care_booking.controller;
 import com.example.pet_care_booking.enums.PaymentStatus;
 import com.example.pet_care_booking.modal.Order;
 import com.example.pet_care_booking.modal.Payments;
+import com.example.pet_care_booking.modal.enums.OrderStatus;
 import com.example.pet_care_booking.repository.OrderRepository;
 import com.example.pet_care_booking.repository.PaymentRepository;
 import com.example.pet_care_booking.service.impl.VnPayService;
@@ -49,14 +50,16 @@ public class VnPayController {
                 break;
             case "24":
                 payment.setStatus(PaymentStatus.CANCELLED);
+                order.setStatus(OrderStatus.CANCELED);
                 break;
             default:
                 payment.setStatus(PaymentStatus.FAILED);
+                order.setStatus(OrderStatus.FAILED_PAYMENT);
                 break;
         }
 
         paymentRepository.save(payment);
-
+        orderRepository.save(order);
         // 🔥 Redirect sang frontend (React)
         String redirectUrl = "http://localhost:5173/payment-result"
                 + "?orderId=" + orderId

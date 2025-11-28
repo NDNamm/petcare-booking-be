@@ -45,7 +45,7 @@ public class ImagesServiceImpl implements ImageService {
       for (MultipartFile items : images) {
          try {
             Map<?, ?> uploadProduct = cloudinary.uploader().upload(items.getBytes(), ObjectUtils.asMap(
-                   "folder", name
+                   "folder", "products"
             ));
             String url = uploadProduct.get("url").toString();
             String publicId = uploadProduct.get("public_id").toString();

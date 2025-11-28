@@ -21,13 +21,14 @@ public class AppointmentsDTO {
    private String phoneNumber;
    private String email;
    private String petName;
+   private LocalDateTime start;
+   private LocalDateTime end;
    private PetType petType;
    private int age;
    private PetGender petGender;
    private AppointStatus appointStatus;
    private String note;
-   private Date appointmentDay;
-   private Time appointmentTime;
+
    private BigDecimal totalPrice;
    private LocalDateTime createdAt;
    private LocalDateTime updatedAt;

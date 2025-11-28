@@ -13,6 +13,7 @@ public interface OrderService {
 
    //Cua User
    Long addOrder(OrderDTO orderDTO, String userName, String sessionId);
+   void updateInforCustom(OrderDTO orderDTO, Long orderId);
    Page<OrderDTO> getOrderClient(String userName, String sessionId, String status, int page, int size);
    void updateOrderByClient(OrderDTO orderDTO, Long orderId, String userName, String sessionId);
    void cancelOrder(Long orderId, String userName, String sessionId);

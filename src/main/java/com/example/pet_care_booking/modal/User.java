@@ -47,6 +47,8 @@ public class User {
     @JsonIgnore
     private List<Appointments> appointments;
 
+    @OneToOne
+    private Veterinarians veterinarian;
 //
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {

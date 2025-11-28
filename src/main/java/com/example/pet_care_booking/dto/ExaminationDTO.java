@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class ExaminationDTO {
    private Long id;
    private String name;
+   private boolean active;
    private BigDecimal price;
    private String description;
    private LocalDateTime createdAt;

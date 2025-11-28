@@ -37,7 +37,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
-    private final ProductReviewRepository  productReviewRepository;
+    private final ProductReviewRepository productReviewRepository;
     private final CurrentUserServiceImpl currentUserServiceImpl;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
@@ -46,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private final VariantRepository variantRepository;
     private final CartService cartService;
     private final PaymentRepository paymentRepository;
+    private final AddressRepository addressRepository;
 
     @Override
     public Page<OrderDTO> getAllOrders(String name, String phoneNumber, String status, int page, int size) {
@@ -136,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
             totalAmount = cart.getItems().stream()
                     .map(CartItem::getTotalPrice)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-        }else{
+        } else {
             totalAmount = orderDTO.getItems().get(0).getPrice();
         }
 
@@ -179,6 +180,21 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         cartService.deleteCartByUser(userName);
         return order.getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateInforCustom(OrderDTO orderDTO, Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        Address address = addressRepository.findByOrder(order)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        address.setCity(orderDTO.getAddressDTO().getCity());
+        address.setDistrict(orderDTO.getAddressDTO().getDistrict());
+        address.setCommune(orderDTO.getAddressDTO().getCommune());
+        order.setPhoneNumber(orderDTO.getPhoneNumber());
+        orderRepository.save(order);
+        addressRepository.save(address);
     }
 
     private List<OrderDetail> buildOrderDetails(Order order, Cart cart, List<ItemDTO> itemDTOs) {
@@ -313,7 +329,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-    private  List<OrderDetailDTO> getOrderDetailDTOS(Order order) {
+    private List<OrderDetailDTO> getOrderDetailDTOS(Order order) {
         List<OrderDetailDTO> orderDetailDTOS = new ArrayList<>();
         User user = currentUserServiceImpl.getCurrentUser();
         if (order.getOrderDetail() != null) {

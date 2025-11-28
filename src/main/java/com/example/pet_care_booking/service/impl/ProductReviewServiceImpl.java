@@ -38,7 +38,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     }
 
     @Override
-    @Cacheable(cacheNames = "review", key = "#slug")
+//    @Cacheable(cacheNames = "review", key = "#slug")
     public Page<ProductReviewDTO> findByProductSlug(String slug, PageRequest pageRequest) {
         Page<ProductReview> products = productReviewRepository.findProductReviewBySlug(slug, pageRequest);
         return products.map(productReviewMapper::toDTO);

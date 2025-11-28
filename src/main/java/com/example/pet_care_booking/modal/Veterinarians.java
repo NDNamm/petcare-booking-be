@@ -16,26 +16,28 @@ import java.util.List;
 @Table(name = "veterinarians")
 public class Veterinarians {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-   @Column(name = "name")
-   private String name;
+    @Column(name = "name")
+    private String name;
 
-   @Column(name = "email")
-   private String email;
+    @Column(name = "email")
+    private String email;
 
-   @Column(name = "phone_number")
-   private String phoneNumber;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
-   @Column(name = "created_at")
-   private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-   @Column(name = "updated_at")
-   private LocalDateTime updatedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-   @OneToMany(mappedBy = "veterinarian",cascade = CascadeType.ALL, orphanRemoval = true)
-   @JsonIgnore
-   private List<Appointments> appointment;
+    @OneToMany(mappedBy = "veterinarian", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Appointments> appointment;
+    @OneToOne
+    private User user;
 }

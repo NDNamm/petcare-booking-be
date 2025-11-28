@@ -10,14 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +20,8 @@ public class AuthController {
 
     private final AuthService authService;
     private final JwtUtils jwtUtils;
-    private final TokenBlacklistService  tokenBlacklistService;
+    private final TokenBlacklistService tokenBlacklistService;
+
     @PostMapping("/login")
     public ApiResponse<AuthDTO> login(@RequestBody UserDTO user,
                                       HttpServletResponse res) {
@@ -62,20 +57,8 @@ public class AuthController {
         return response;
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status((HttpStatus.UNAUTHORIZED)).body("Unauthorized");
-        }
-        String username = authentication.getName();
-        String role = authentication.getAuthorities()
-                .stream().findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElse("USER");
-
-        return ResponseEntity.ok(Map.of(
-                "username", username,
-                "role", role
-        ));
+    @GetMapping("/getInfoUser")
+    public ResponseEntity<AuthDTO> getInfoUser() {
+        return ResponseEntity.ok(authService.getInforUser());
     }
 }

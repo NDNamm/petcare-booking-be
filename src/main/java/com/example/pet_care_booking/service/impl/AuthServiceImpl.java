@@ -29,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final RoleRepository roleRepository;
+    private final CurrentUserServiceImpl currentUserServiceImpl;
 
     @Override
     public AuthDTO login(UserDTO dto, HttpServletResponse response) {
@@ -76,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void register(UserDTO dto) {
 
-        Role role = roleRepository.findById(2L)
+        Role role = roleRepository.findById(4L)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
         Optional<User> existUsername = userRepository.findUserByUserName(dto.getUserName());
         if (existUsername.isPresent()) throw new AppException(ErrorCode.USER_NAME_EXIST);
@@ -131,5 +132,16 @@ public class AuthServiceImpl implements AuthService {
         return getAuth(user, newAccessToken);
     }
 
-
+    @Override
+    public AuthDTO getInforUser() {
+        User user = userRepository.findById(currentUserServiceImpl.getCurrentUser().getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return AuthDTO.builder()
+                .userId(user.getId())
+                .userName(user.getUserName())
+                .phoneNumber(user.getPhoneNumber())
+                .nameRole(user.getRole().getName())
+                .email(user.getEmail())
+                .build();
+    }
 }

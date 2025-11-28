@@ -4,6 +4,7 @@ import com.example.pet_care_booking.dto.ExaminationDTO;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 public interface ExaminationService {
@@ -11,4 +12,5 @@ public interface ExaminationService {
    ExaminationDTO createExamination(ExaminationDTO examinationDTO);
    ExaminationDTO updateExamination(Long id,ExaminationDTO examinationDTO);
    void deleteExamination(Long id);
+    int[] addExaminationSpecial(int[] examinationIds, Long appointmentId);
 }
