@@ -4,12 +4,14 @@ import com.example.pet_care_booking.modal.User;
 import com.example.pet_care_booking.repository.UserRepository;
 import com.example.pet_care_booking.security.JwtAuthenticationFilter;
 import com.example.pet_care_booking.security.JwtUtils;
+import com.example.pet_care_booking.security.RestAuthenticationEntryPoint;
 import com.example.pet_care_booking.service.impl.CustomOidcUserService;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,7 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.UUID;
 
@@ -33,7 +37,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CustomOidcUserService customOidcUserService, JwtUtils jwtUtils, UserRepository userRepository) throws Exception {
         httpSecurity
-                .cors(withDefaults())
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -55,6 +59,7 @@ public class SecurityConfig {
                         // Any other API requests need authentication
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/oauth2/authorization/google")
                         .userInfoEndpoint(userInfor -> userInfor.oidcUserService(customOidcUserService))
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
@@ -72,6 +77,16 @@ public class SecurityConfig {
                             String redirectUrl = "http://localhost:5173/oauth2/success?token=" + token;
                             response.sendRedirect(redirectUrl);
                         }))
+                .exceptionHandling(exception -> exception
+                        .defaultAuthenticationEntryPointFor(
+                                new RestAuthenticationEntryPoint(),
+                                new AntPathRequestMatcher("/api/**")
+                        )
+                        .defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/google"),
+                                new AntPathRequestMatcher("/**")
+                        )
+                )
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();

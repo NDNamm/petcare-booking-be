@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -47,6 +48,8 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final PaymentRepository paymentRepository;
     private final AddressRepository addressRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Page<OrderDTO> getAllOrders(String name, String phoneNumber, String status, int page, int size) {
@@ -96,6 +99,22 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         order.setStatus(orderDTO.getStatus());
+        if (orderDTO.getStatus().equals(OrderStatus.COMPLETED)) {
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
+            for (OrderDetail orderDetail : orderDetails) {
+                Product product = productRepository.findById(orderDetail.getProduct().getId())
+                        .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+                Variants variants = variantRepository.findBySizeAndProduct(orderDetail.getVariant().getSize(), product)
+                        .orElseThrow(() -> new IllegalArgumentException("Not found"));
+
+                if (orderDetail.getQuantity() > variants.getStock()) {
+                    throw new RuntimeException("Product not enough");
+                }
+                variants.setStock(variants.getStock() - orderDetail.getQuantity());
+                variantRepository.save(variants);
+                redisTemplate.delete("product::" + product.getSlug());
+            }
+        }
         orderRepository.save(order);
     }
 
@@ -205,14 +224,14 @@ public class OrderServiceImpl implements OrderService {
                 Product product = productRepository.findById(cartItem.getProduct().getId())
                         .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
                 Variants variant = cartItem.getVariant();
-                if (variant.getStock() < cartItem.getQuantity()) {
-                    throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-                }
-                variant.setStock(variant.getStock() - cartItem.getQuantity());
-
-                if (!product.getStatus().equals(ProductStatus.AVAILABLE)) {
-                    throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
-                }
+//                if (variant.getStock() < cartItem.getQuantity()) {
+//                    throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+//                }
+//                variant.setStock(variant.getStock() - cartItem.getQuantity());
+//
+//                if (!product.getStatus().equals(ProductStatus.AVAILABLE)) {
+//                    throw new AppException(ErrorCode.PRODUCT_OUT_OF_STOCK);
+//                }
 
 //                if (product.getSl() <= 0) {
 //                    product.setStatus(ProductStatus.OUT_OF_STOCK);
@@ -290,7 +309,7 @@ public class OrderServiceImpl implements OrderService {
 
         validateOrderOwnership(order, userName, sessionId);
 
-        if (order.getStatus() != OrderStatus.PENDING) {
+        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
             throw new AppException(ErrorCode.ORDER_CANNOT_BE_MODIFIED);
         }
         if (orderDTO.getNote() != null) {
@@ -303,12 +322,13 @@ public class OrderServiceImpl implements OrderService {
             order.setName(orderDTO.getFullName());
         }
         if (orderDTO.getAddressDTO() != null) {
-            Address address = Address.builder()
-                    .homeAddress(orderDTO.getAddressDTO().getHomeAddress())
-                    .city(orderDTO.getAddressDTO().getCity())
-                    .district(orderDTO.getAddressDTO().getDistrict())
-                    .commune(orderDTO.getAddressDTO().getCommune())
-                    .build();
+            Address address = addressRepository.findByOrder(order)
+                    .orElseThrow(() -> new IllegalArgumentException("Not found orderId"));
+
+            address.setHomeAddress(orderDTO.getAddressDTO().getHomeAddress());
+            address.setCity(orderDTO.getAddressDTO().getCity());
+            address.setDistrict(orderDTO.getAddressDTO().getDistrict());
+            address.setCommune(orderDTO.getAddressDTO().getCommune());
 
             order.setAddress(address);
         }

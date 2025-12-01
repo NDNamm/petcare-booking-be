@@ -24,13 +24,17 @@ public class ProductController {
     @GetMapping("")
     public ApiResponse<Page<ProductDTO>> getAllProduct(@RequestParam(required = false) String name,
                                                        @RequestParam(required = false) Long categoryId,
-                                                       @RequestParam(name = "size", required = false) String sizeVariant,
+                                                       @RequestParam(name = "sizeVariant", required = false) String sizeVariant,
                                                        @RequestParam(required = false) BigDecimal minPrice,
+                                                       @RequestParam(required = false) Integer size,
                                                        @RequestParam(required = false) BigDecimal maxPrice,
                                                        @RequestParam(defaultValue = "0") int page) {
 
         ApiResponse<Page<ProductDTO>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(productService.getAllProducts(name, categoryId, sizeVariant, minPrice, maxPrice, page, 6));
+        if(size == null){
+            size = 6;
+        }
+        apiResponse.setData(productService.getAllProducts(name, categoryId, sizeVariant, minPrice, maxPrice, page, size));
         return apiResponse;
     }
 

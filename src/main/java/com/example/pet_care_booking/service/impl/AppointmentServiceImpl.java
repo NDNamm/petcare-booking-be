@@ -14,6 +14,8 @@ import com.example.pet_care_booking.repository.VeterinarianRepository;
 import com.example.pet_care_booking.service.AppointmentService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -22,10 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
+import java.text.Normalizer;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -182,6 +188,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         app.setUpdatedAt(LocalDateTime.now());
         appointmentRepository.save(app);
     }
+    public static String removeAccent(String s) {
+        // Chuyển về dạng NFD (decompose)
+        String temp = Normalizer.normalize(s, Normalizer.Form.NFD);
+        // Loại bỏ các ký tự dấu (diacritics)
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(temp).replaceAll("");
+    }
+
 
     @Override
     public byte[] generateInvoice(Long id) {
@@ -189,31 +203,274 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_NOT_FOUND));
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Document document = new Document(PageSize.A4, 50, 50, 50, 50);
-            PdfWriter.getInstance(document, out);
+            Document document = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter writer = PdfWriter.getInstance(document, out);
             document.open();
 
-            // Dùng font mặc định, chỉ hỗ trợ ký tự Latin (không dấu)
-            BaseFont baseFont = BaseFont.createFont(
-                    BaseFont.HELVETICA,
-                    BaseFont.CP1252,
-                    BaseFont.NOT_EMBEDDED
-            );
-            Font titleFont = new Font(baseFont, 18, Font.BOLD, BaseColor.BLUE);
-            Font normalFont = new Font(baseFont, 12, Font.NORMAL, BaseColor.BLACK);
+            // Fonts
+            BaseFont baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            BaseFont baseFontBold = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 
-            Paragraph title = new Paragraph("HOA DON LICH KHAM #" + app.getId(), titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(20f);
-            document.add(title);
+            Font titleFont = new Font(baseFontBold, 24, Font.BOLD, new BaseColor(41, 128, 185));
+            Font headerFont = new Font(baseFontBold, 14, Font.BOLD, new BaseColor(44, 62, 80));
+            Font normalFont = new Font(baseFont, 11, Font.NORMAL, new BaseColor(52, 73, 94));
+            Font boldFont = new Font(baseFontBold, 11, Font.BOLD, new BaseColor(52, 73, 94));
+            Font smallFont = new Font(baseFont, 9, Font.NORMAL, new BaseColor(127, 140, 141));
+            Font totalFont = new Font(baseFontBold, 16, Font.BOLD, new BaseColor(231, 76, 60));
 
-            document.add(new Paragraph("Khach hang: " + app.getOwnerName(), normalFont));
-            document.add(new Paragraph("Thu cung: " + app.getPetName(), normalFont));
-            document.add(new Paragraph("Dich vu: " +
-                    app.getExamination().stream()
-                            .map(Examination::getName)
-                            .collect(Collectors.joining(", ")), normalFont));
-            document.add(new Paragraph("Tong tien: " + String.format("%,.0f VND", app.getTotalPrice()), normalFont));
+            // ========== HEADER SECTION ==========
+            PdfPTable headerTable = new PdfPTable(2);
+            headerTable.setWidthPercentage(100);
+            headerTable.setWidths(new float[]{1, 1});
+            headerTable.setSpacingAfter(20f);
+
+            // Logo/Company Info (Left)
+            PdfPCell companyCell = new PdfPCell();
+            companyCell.setBorder(Rectangle.NO_BORDER);
+            companyCell.setPaddingBottom(10f);
+
+            Paragraph companyName = new Paragraph("PET CARE NQA", new Font(baseFontBold, 20, Font.BOLD, new BaseColor(41, 128, 185)));
+            Paragraph companyAddress = new Paragraph("Dong Anh Ha Noi", smallFont);
+            Paragraph companyPhone = new Paragraph("Hotline: 0236 123 4567", smallFont);
+            Paragraph companyEmail = new Paragraph("Email: contact@petcare.vn", smallFont);
+
+            companyCell.addElement(companyName);
+            companyCell.addElement(companyAddress);
+            companyCell.addElement(companyPhone);
+            companyCell.addElement(companyEmail);
+            headerTable.addCell(companyCell);
+
+            // Invoice Info (Right)
+            PdfPCell invoiceInfoCell = new PdfPCell();
+            invoiceInfoCell.setBorder(Rectangle.NO_BORDER);
+            invoiceInfoCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            invoiceInfoCell.setPaddingBottom(10f);
+
+            Paragraph invoiceTitle = new Paragraph("HOA DON", titleFont);
+            invoiceTitle.setAlignment(Element.ALIGN_RIGHT);
+            Paragraph invoiceNo = new Paragraph("So: #INV-" + String.format("%06d", app.getId()), boldFont);
+            invoiceNo.setAlignment(Element.ALIGN_RIGHT);
+            Paragraph invoiceDate = new Paragraph("Ngay: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), normalFont);
+            invoiceDate.setAlignment(Element.ALIGN_RIGHT);
+
+            invoiceInfoCell.addElement(invoiceTitle);
+            invoiceInfoCell.addElement(invoiceNo);
+            invoiceInfoCell.addElement(invoiceDate);
+            headerTable.addCell(invoiceInfoCell);
+
+            document.add(headerTable);
+
+            // ========== DIVIDER LINE ==========
+            PdfPTable divider = new PdfPTable(1);
+            divider.setWidthPercentage(100);
+            PdfPCell dividerCell = new PdfPCell();
+            dividerCell.setBorder(Rectangle.NO_BORDER);
+            dividerCell.setBorderWidthBottom(2f);
+            dividerCell.setBorderColorBottom(new BaseColor(41, 128, 185));
+            dividerCell.setPaddingBottom(10f);
+            dividerCell.setPhrase(new Phrase(" "));
+            divider.addCell(dividerCell);
+            divider.setSpacingAfter(20f);
+            document.add(divider);
+
+            // ========== CUSTOMER INFO SECTION ==========
+            PdfPTable customerTable = new PdfPTable(2);
+            customerTable.setWidthPercentage(100);
+            customerTable.setWidths(new float[]{1, 1});
+            customerTable.setSpacingAfter(25f);
+
+            // Customer Info (Left)
+            PdfPCell customerCell = new PdfPCell();
+            customerCell.setBorder(Rectangle.NO_BORDER);
+            customerCell.setBackgroundColor(new BaseColor(236, 240, 241));
+            customerCell.setPadding(15f);
+//            customerCell.setBorderRadius(8f);
+
+            Paragraph customerTitle = new Paragraph("THONG TIN KHACH HANG", headerFont);
+            customerTitle.setSpacingAfter(10f);
+            customerCell.addElement(customerTitle);
+            customerCell.addElement(new Paragraph("Ho ten: " + removeAccent(app.getOwnerName()), normalFont));
+            customerCell.addElement(new Paragraph("So dien thoai: " + (app.getPhoneNumber() != null ? app.getPhoneNumber() : "N/A"), normalFont));
+            customerCell.addElement(new Paragraph("Email: " + (app.getEmail() != null ? app.getEmail() : "N/A"), normalFont));
+            headerTable.addCell(customerCell);
+            customerTable.addCell(customerCell);
+
+            // Pet Info (Right)
+            PdfPCell petCell = new PdfPCell();
+            petCell.setBorder(Rectangle.NO_BORDER);
+            petCell.setBackgroundColor(new BaseColor(232, 245, 233));
+            petCell.setPadding(15f);
+
+            Paragraph petTitle = new Paragraph("THONG TIN THU CUNG", headerFont);
+            petTitle.setSpacingAfter(10f);
+            petCell.addElement(petTitle);
+            petCell.addElement(new Paragraph("Ten: " + app.getPetName(), normalFont));
+            petCell.addElement(new Paragraph("Loai: " + (app.getPetType() != null ? removeAccent(String.valueOf(app.getPetType())) : "N/A"), normalFont));
+            petCell.addElement(new Paragraph("Ngay kham: " + (app.getCreatedAt() != null ?
+                    app.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A"), normalFont));
+            customerTable.addCell(petCell);
+
+            document.add(customerTable);
+
+            // ========== SERVICES TABLE ==========
+            Paragraph servicesTitle = new Paragraph("CHI TIET DICH VU", headerFont);
+            servicesTitle.setSpacingAfter(15f);
+            document.add(servicesTitle);
+
+            PdfPTable servicesTable = new PdfPTable(4);
+            servicesTable.setWidthPercentage(100);
+            servicesTable.setWidths(new float[]{0.5f, 3f, 1f, 1.5f});
+            servicesTable.setSpacingAfter(20f);
+
+            // Table Header
+            BaseColor headerBgColor = new BaseColor(41, 128, 185);
+            Font tableHeaderFont = new Font(baseFontBold, 11, Font.BOLD, BaseColor.WHITE);
+
+            String[] headers = {"STT", "Ten dich vu", "So luong", "Thanh tien"};
+            for (String header : headers) {
+                PdfPCell headerCell = new PdfPCell(new Phrase(header, tableHeaderFont));
+                headerCell.setBackgroundColor(headerBgColor);
+                headerCell.setPadding(10f);
+                headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                headerCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                servicesTable.addCell(headerCell);
+            }
+
+            // Table Body
+            List<Examination> examinations = app.getExamination();
+            int index = 1;
+            double subtotal = 0;
+
+            BaseColor rowColor1 = BaseColor.WHITE;
+            BaseColor rowColor2 = new BaseColor(245, 247, 250);
+
+            for (Examination exam : examinations) {
+                BaseColor rowColor = (index % 2 == 0) ? rowColor2 : rowColor1;
+                double price = exam.getPrice() != null ? exam.getPrice().doubleValue() : 0;
+                subtotal += price;
+
+                // STT
+                PdfPCell sttCell = new PdfPCell(new Phrase(String.valueOf(index), normalFont));
+                sttCell.setBackgroundColor(rowColor);
+                sttCell.setPadding(10f);
+                sttCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                servicesTable.addCell(sttCell);
+
+                // Service Name
+                PdfPCell nameCell = new PdfPCell(new Phrase(removeAccent(exam.getName()), normalFont));
+                nameCell.setBackgroundColor(rowColor);
+                nameCell.setPadding(10f);
+                servicesTable.addCell(nameCell);
+
+                // Quantity
+                PdfPCell qtyCell = new PdfPCell(new Phrase("1", normalFont));
+                qtyCell.setBackgroundColor(rowColor);
+                qtyCell.setPadding(10f);
+                qtyCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                servicesTable.addCell(qtyCell);
+
+                // Price
+                PdfPCell priceCell = new PdfPCell(new Phrase(String.format("%,.0f VND", price), normalFont));
+                priceCell.setBackgroundColor(rowColor);
+                priceCell.setPadding(10f);
+                priceCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                servicesTable.addCell(priceCell);
+
+                index++;
+            }
+
+            document.add(servicesTable);
+
+            // ========== TOTAL SECTION ==========
+            PdfPTable totalTable = new PdfPTable(2);
+            totalTable.setWidthPercentage(50);
+            totalTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalTable.setSpacingBefore(10f);
+
+            // Subtotal Row
+            PdfPCell subtotalLabel = new PdfPCell(new Phrase("Tam tinh:", boldFont));
+            subtotalLabel.setBorder(Rectangle.NO_BORDER);
+            subtotalLabel.setPadding(8f);
+            subtotalLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
+            totalTable.addCell(subtotalLabel);
+
+            PdfPCell subtotalValue = new PdfPCell(new Phrase(String.format("%,.0f VND", subtotal), normalFont));
+            subtotalValue.setBorder(Rectangle.NO_BORDER);
+            subtotalValue.setPadding(8f);
+            subtotalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalTable.addCell(subtotalValue);
+
+            // Discount Row (if any)
+            PdfPCell discountLabel = new PdfPCell(new Phrase("Giam gia:", boldFont));
+            discountLabel.setBorder(Rectangle.NO_BORDER);
+            discountLabel.setPadding(8f);
+            discountLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
+            totalTable.addCell(discountLabel);
+
+            PdfPCell discountValue = new PdfPCell(new Phrase("0 VND", normalFont));
+            discountValue.setBorder(Rectangle.NO_BORDER);
+            discountValue.setPadding(8f);
+            discountValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalTable.addCell(discountValue);
+
+            // Divider
+            PdfPCell totalDivider1 = new PdfPCell(new Phrase(" "));
+            totalDivider1.setBorder(Rectangle.NO_BORDER);
+            totalDivider1.setBorderWidthBottom(1f);
+            totalDivider1.setBorderColorBottom(new BaseColor(189, 195, 199));
+            totalTable.addCell(totalDivider1);
+
+            PdfPCell totalDivider2 = new PdfPCell(new Phrase(" "));
+            totalDivider2.setBorder(Rectangle.NO_BORDER);
+            totalDivider2.setBorderWidthBottom(1f);
+            totalDivider2.setBorderColorBottom(new BaseColor(189, 195, 199));
+            totalTable.addCell(totalDivider2);
+
+            // Total Row
+            PdfPCell totalLabel = new PdfPCell(new Phrase("TONG CONG:", new Font(baseFontBold, 14, Font.BOLD, new BaseColor(44, 62, 80))));
+            totalLabel.setBorder(Rectangle.NO_BORDER);
+            totalLabel.setPadding(10f);
+            totalLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
+            totalTable.addCell(totalLabel);
+
+            PdfPCell totalValue = new PdfPCell(new Phrase(String.format("%,.0f VND", app.getTotalPrice()), totalFont));
+            totalValue.setBorder(Rectangle.NO_BORDER);
+            totalValue.setPadding(10f);
+            totalValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalTable.addCell(totalValue);
+
+            document.add(totalTable);
+
+            // ========== FOOTER SECTION ==========
+            Paragraph footer = new Paragraph();
+            footer.setSpacingBefore(50f);
+            footer.add(new Chunk("Cam on quy khach da su dung dich vu cua chung toi!\n", new Font(baseFontBold, 12, Font.ITALIC, new BaseColor(41, 128, 185))));
+            footer.add(new Chunk("Moi thac mac xin lien he hotline: 0236 123 4567", smallFont));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            document.add(footer);
+
+            // Signature Area
+            PdfPTable signatureTable = new PdfPTable(2);
+            signatureTable.setWidthPercentage(100);
+            signatureTable.setSpacingBefore(40f);
+
+            PdfPCell customerSignCell = new PdfPCell();
+            customerSignCell.setBorder(Rectangle.NO_BORDER);
+            customerSignCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            Paragraph customerSign = new Paragraph("Khach hang\n(Ky, ghi ro ho ten)", normalFont);
+            customerSign.setAlignment(Element.ALIGN_CENTER);
+            customerSignCell.addElement(customerSign);
+            signatureTable.addCell(customerSignCell);
+
+            PdfPCell staffSignCell = new PdfPCell();
+            staffSignCell.setBorder(Rectangle.NO_BORDER);
+            staffSignCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            Paragraph staffSign = new Paragraph("Nhan vien\n(Ky, ghi ro ho ten)", normalFont);
+            staffSign.setAlignment(Element.ALIGN_CENTER);
+            staffSignCell.addElement(staffSign);
+            signatureTable.addCell(staffSignCell);
+
+            document.add(signatureTable);
 
             document.close();
             return out.toByteArray();

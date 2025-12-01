@@ -26,6 +26,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +49,7 @@ public class ProductServiceImpl implements ProductService {
     private final VariantService variantService;
     private final VariantRepository variantRepository;
     private final ProductReviewRepository productReviewRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Page<ProductDTO> getAllProducts(String name, Long categoryId, String sizeVariant
@@ -139,6 +142,7 @@ public class ProductServiceImpl implements ProductService {
             }
 
             Product product1 = productRepository.save(product);
+            redisTemplate.delete("product::" + product.getSlug());
             return convertProduct(product1);
         } catch (IOException e) {
             throw new AppException(ErrorCode.UPDATE_IMAGE_FAIL);

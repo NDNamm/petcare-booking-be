@@ -8,6 +8,7 @@ import com.example.pet_care_booking.modal.Examination;
 import com.example.pet_care_booking.repository.AppointmentRepository;
 import com.example.pet_care_booking.repository.ExaminationRepository;
 import com.example.pet_care_booking.service.ExaminationService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -99,6 +100,7 @@ public class ExaminationServiceImpl implements ExaminationService {
     }
 
     @Override
+    @Transactional
     public int[] addExaminationSpecial(int[] examinationIds, Long appointmentId) {
         Appointments appointments = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_NOT_FOUND));
