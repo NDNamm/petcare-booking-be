@@ -407,11 +407,11 @@ public class AppointmentServiceImpl implements AppointmentService {
 //            discountLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
 //            totalTable.addCell(discountLabel);
 
-            PdfPCell discountValue = new PdfPCell(new Phrase("0 VND", normalFont));
-            discountValue.setBorder(Rectangle.NO_BORDER);
-            discountValue.setPadding(8f);
-            discountValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            totalTable.addCell(discountValue);
+//            PdfPCell discountValue = new PdfPCell(new Phrase("0 VND", normalFont));
+//            discountValue.setBorder(Rectangle.NO_BORDER);
+//            discountValue.setPadding(8f);
+//            discountValue.setHorizontalAlignment(Element.ALIGN_RIGHT);
+//            totalTable.addCell(discountValue);
 
             // Divider
             PdfPCell totalDivider1 = new PdfPCell(new Phrase(" "));
