@@ -1,0 +1,609 @@
+-- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: pet_care_booking
+-- ------------------------------------------------------
+-- Server version	8.0.44
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `addresses`
+--
+
+DROP TABLE IF EXISTS `addresses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `addresses` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint DEFAULT NULL,
+  `session_id` varchar(50) DEFAULT NULL,
+  `home_address` varchar(255) NOT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `district` varchar(100) DEFAULT NULL,
+  `commune` varchar(100) DEFAULT NULL,
+  `user_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `order_id` (`order_id`),
+  KEY `FK1fa36y2oqhao3wgg2rw1pi459` (`user_id`),
+  CONSTRAINT `addresses_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK1fa36y2oqhao3wgg2rw1pi459` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `addresses`
+--
+
+LOCK TABLES `addresses` WRITE;
+/*!40000 ALTER TABLE `addresses` DISABLE KEYS */;
+INSERT INTO `addresses` VALUES (2,3,'6c07e09d-808a-4f65-afa7-d8b5174e848c','Trung Oai','Hà Nội','Dong Anh','Tien Duong',NULL),(4,NULL,NULL,'Trung Oai','Hà Nội','Dong Anh','Tien Duong',NULL),(6,NULL,NULL,'Trunsadg Oai','Hà Nội','Dong Anh','Tien Duong',NULL),(7,5,NULL,'Trung Oai','Hà Nội','Dong Anh','Tien Duong',NULL),(8,6,NULL,'Trung Oai','Hà Nội','Dong Anh','Tien Duong',1),(9,7,NULL,'Trung Oai','Hà Nội','Dong Anh','Tien Duong',1),(10,8,NULL,'rưe','rew','rưe','rửe',6),(11,9,NULL,'1','1','11','1',6),(14,12,NULL,'3','3','3','3',6),(18,16,NULL,'2','2','2','2',6),(19,17,NULL,'1','1','1','1',6),(20,18,NULL,'1','1','1','1',6),(21,19,NULL,'Trung Oai','Hà Nội','Đông Anh','Đông Anh',6),(22,20,NULL,'Trung Oai','Hà Nôik','Tiên Dương ','Đông Anh',6),(41,39,NULL,'42432','423432','43243','4343',6),(45,43,NULL,'fsdfds','sfdfds','fsdfds','fdsf',6),(46,44,NULL,'Trung Oai','Hà Nội','Tiên Dương','Đông Anh',6),(47,45,NULL,'423432','424','4234','42343',6),(48,46,NULL,'rwerew','rwrwe','rwerew','rwrew',6),(49,47,NULL,'fsdfds','sfsdfd','fsdfds','fsdf',50),(50,48,NULL,'đong anh','Hà Nội','đông anh','Hà Nội',6),(51,49,NULL,'fdsdfsdf','asdsa','asdas','ddadsa',51),(52,50,NULL,'dấddd','đâsdsadd','ddđd','đasadsads',51),(54,NULL,NULL,'trung oai','fsdfdsf','sfsdf','fsdfds',NULL),(55,NULL,NULL,'trung oai','ha noi','ding anh','dong anh',NULL),(56,51,NULL,'Trung Oai','Hà Nội','Đông Anh','Tiên Dương',NULL);
+/*!40000 ALTER TABLE `addresses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `appointments`
+--
+
+DROP TABLE IF EXISTS `appointments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `appointments` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
+  `owner_name` varchar(50) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `phone_number` varchar(12) DEFAULT NULL,
+  `pet_name` varchar(100) DEFAULT NULL,
+  `pet_type` tinyint DEFAULT NULL,
+  `pet_age` int DEFAULT NULL,
+  `pet_gender` tinyint DEFAULT NULL,
+  `vet_id` bigint DEFAULT NULL,
+  `total_price` decimal(38,2) DEFAULT NULL,
+  `status` enum('PENDING','CONFIRMED','COMPLETED','CANCELLED','IN_QUEUE','IN_PROGRESS') DEFAULT 'PENDING',
+  `note` text,
+  `pet_id` bigint DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `end_time` datetime(6) DEFAULT NULL,
+  `start_time` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `vet_id` (`vet_id`),
+  CONSTRAINT `appointments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `appointments_ibfk_2` FOREIGN KEY (`vet_id`) REFERENCES `veterinarians` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `appointments`
+--
+
+LOCK TABLES `appointments` WRITE;
+/*!40000 ALTER TABLE `appointments` DISABLE KEYS */;
+INSERT INTO `appointments` VALUES (14,NULL,NULL,'Nguyễn Văn C','dangcapnr3@gmail.com','0842432432','Chó',1,12,1,2,750000.00,'COMPLETED','test',NULL,'2025-11-26 09:33:01','2025-11-26 10:38:27','2025-11-26 17:03:00.885988','2025-11-26 16:33:00.885988'),(15,NULL,NULL,'nguyen','test@gmail.com','0984324325','da',1,232,0,2,500000.00,'COMPLETED','rwerew',NULL,'2025-11-26 10:46:09','2025-12-01 07:17:13','2025-11-26 18:16:08.618476','2025-11-26 17:46:08.618476'),(16,NULL,NULL,'Nguyễn Quang Anh','dangcapnr2@gmail.com','0965693740','pet test 01',1,21,0,1,500000.00,'COMPLETED','test lịch khám pet',NULL,'2025-11-28 02:13:44','2025-12-01 07:10:25','2025-11-28 09:43:44.450536','2025-11-28 09:13:44.450536'),(17,NULL,NULL,'nguyen quang anh','dancgapnr2@gmail.com','0943242345','chó',1,20,0,1,500000.00,'COMPLETED','rewre',NULL,'2025-12-01 07:26:08','2025-12-01 07:57:00','2025-12-01 14:56:07.532823','2025-12-01 14:26:07.532823');
+/*!40000 ALTER TABLE `appointments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cart_items`
+--
+
+DROP TABLE IF EXISTS `cart_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cart_items` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `quantity` bigint DEFAULT NULL,
+  `price` decimal(38,2) DEFAULT NULL,
+  `total_price` decimal(38,2) DEFAULT NULL,
+  `product_id` bigint DEFAULT NULL,
+  `cart_id` bigint DEFAULT NULL,
+  `variant_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `product_id` (`product_id`),
+  KEY `cart_id` (`cart_id`),
+  KEY `FKlbfbpwnrjag6b2e1mw21l8ygu` (`variant_id`),
+  CONSTRAINT `cart_items_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  CONSTRAINT `cart_items_ibfk_2` FOREIGN KEY (`cart_id`) REFERENCES `carts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FKlbfbpwnrjag6b2e1mw21l8ygu` FOREIGN KEY (`variant_id`) REFERENCES `variants` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cart_items`
+--
+
+LOCK TABLES `cart_items` WRITE;
+/*!40000 ALTER TABLE `cart_items` DISABLE KEYS */;
+INSERT INTO `cart_items` VALUES (28,1,70001.00,70001.00,1,5,1);
+/*!40000 ALTER TABLE `cart_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `carts`
+--
+
+DROP TABLE IF EXISTS `carts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `carts` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
+  `session_id` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `total_money` decimal(38,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  CONSTRAINT `carts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `carts`
+--
+
+LOCK TABLES `carts` WRITE;
+/*!40000 ALTER TABLE `carts` DISABLE KEYS */;
+INSERT INTO `carts` VALUES (1,1,NULL,'2025-08-18 15:33:44',0.00),(3,NULL,'6c07e09d-808a-4f65-afa7-d8b5174e848c','2025-08-19 10:21:01',NULL),(4,6,NULL,'2025-09-02 14:22:36',0.00),(5,9,NULL,'2025-11-17 03:10:21',70001.00),(6,49,NULL,'2025-11-17 04:05:45',0.00),(7,50,NULL,'2025-11-20 03:27:19',0.00),(8,51,NULL,'2025-11-28 02:11:12',0.00);
+/*!40000 ALTER TABLE `carts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `categories`
+--
+
+DROP TABLE IF EXISTS `categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `categories` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `image_url` varchar(255) DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `categories`
+--
+
+LOCK TABLES `categories` WRITE;
+/*!40000 ALTER TABLE `categories` DISABLE KEYS */;
+INSERT INTO `categories` VALUES (1,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755359894/category/k0cmvhn7kpslghuaiysg.jpg','Thức ăn khô cho chó','Thức ăn khô cho chó là loại thức ăn dạng hạt được chế biến và sấy khô, cung cấp đầy đủ dinh dưỡng thiết yếu cho chó ở từng giai đoạn phát triển.','2025-08-18 14:12:12','2025-08-16 15:58:17'),(2,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755526330/category/hsqosqopuaf6q3osx5mt.jpg','Đồ chơi cho mèo','Các loại đồ chơi cho mèo giúp mèo vận động, vui chơi và phát triển trí thông minh, bao gồm bóng, cần câu, và đồ chơi tương tác.','2025-08-18 14:12:12','2025-08-18 14:13:10'),(3,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755527915/category/bfbxffazxndsehftutkz.jpg','Nhà chơi mèo mini','Nhà chơi nhỏ gọn, có sàn leo trèo và hang ngủ, giúp mèo thỏa sức khám phá và nghỉ ngơi.','2025-08-18 14:38:38','2025-08-18 14:38:38'),(4,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755528455/category/nc4cymstrpxespislgqx.jpg','Phụ kiện mèo','Dây dắt, vòng cổ, đồ chơi cho mèo.','2025-08-18 14:47:38','2025-08-18 14:47:38'),(5,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1764296707/category/ttauzhgj2ezgn1v1h7bf.webp','Khác','other','2025-11-28 02:25:11','2025-11-28 02:25:11');
+/*!40000 ALTER TABLE `categories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `examination`
+--
+
+DROP TABLE IF EXISTS `examination`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `examination` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  `description` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `activate` bit(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `examination`
+--
+
+LOCK TABLES `examination` WRITE;
+/*!40000 ALTER TABLE `examination` DISABLE KEYS */;
+INSERT INTO `examination` VALUES (1,'Khám tổng quát',300000.00,'Kiểm tra sức khỏe cơ bản, nghe tim, kiểm tra mắt, tai, răng','2025-08-28 03:57:17','2025-11-26 06:56:03',_binary ''),(2,'Chụp X-quang',200000.00,'Chẩn đoán xương, nội tạng','2025-08-28 04:50:39','2025-11-26 06:56:05',_binary '\0'),(3,'Xét nghiệm máu',150000.00,'Kiểm tra chức năng gan, thận, máu tổng quát','2025-08-28 04:51:13','2025-11-26 06:56:07',_binary '\0'),(4,'Tẩy giun sán',100000.00,'Ngừa giun sán đường ruột','2025-08-28 04:51:38','2025-11-26 06:56:09',_binary '\0'),(5,'Tiêm phòng vắc-xin',300000.00,'Tiêm các loại vắc-xin phòng dại, care, parvo, cúm','2025-09-01 15:00:39','2025-11-26 06:56:12',_binary '');
+/*!40000 ALTER TABLE `examination` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `images`
+--
+
+DROP TABLE IF EXISTS `images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `images` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `image_url` varchar(255) DEFAULT NULL,
+  `public_id` varchar(255) DEFAULT NULL,
+  `size` bigint DEFAULT NULL,
+  `product_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKghwsjbjo7mg3iufxruvq6iu3q` (`product_id`),
+  CONSTRAINT `FKghwsjbjo7mg3iufxruvq6iu3q` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `images`
+--
+
+LOCK TABLES `images` WRITE;
+/*!40000 ALTER TABLE `images` DISABLE KEYS */;
+INSERT INTO `images` VALUES (1,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755443014/wjuvgu5qovvlocbc8oh7.webp','wjuvgu5qovvlocbc8oh7',13322,1),(2,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755443018/bifzmjajclo42jff6xe9.webp','bifzmjajclo42jff6xe9',29054,1),(3,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755443019/tntpa0xrfxekfkeuseaq.jpg','tntpa0xrfxekfkeuseaq',15094,1),(4,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755443021/kkw0sb02qmxyml9jeoop.webp','kkw0sb02qmxyml9jeoop',19208,1),(5,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755443023/zroj5dpgrhij9juubitj.jpg','zroj5dpgrhij9juubitj',93540,1),(6,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755445925/Royal%20Canin%20Medium%20Puppy/olnpdsueaxuaj4tfpubq.jpg','Royal Canin Medium Puppy/olnpdsueaxuaj4tfpubq',9815,2),(7,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755445926/Royal%20Canin%20Medium%20Puppy/jumusez5qsxavevig7zh.jpg','Royal Canin Medium Puppy/jumusez5qsxavevig7zh',10141,2),(8,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755445928/Royal%20Canin%20Medium%20Puppy/jmuayxtkpozj4aplwzas.jpg','Royal Canin Medium Puppy/jmuayxtkpozj4aplwzas',12625,2),(9,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755445930/Royal%20Canin%20Medium%20Puppy/bfwtxfj5e7owy50aohwh.jpg','Royal Canin Medium Puppy/bfwtxfj5e7owy50aohwh',8066,2),(10,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755445931/Royal%20Canin%20Medium%20Puppy/efsawmnudq00cnwy6eoi.png','Royal Canin Medium Puppy/efsawmnudq00cnwy6eoi',14950,2),(11,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755526667/B%C3%B3ng%20n%E1%BB%89%20m%C3%A8o/lddtm50upmtaxaebwf6e.jpg','Bóng nỉ mèo/lddtm50upmtaxaebwf6e',11003,3),(12,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755526670/B%C3%B3ng%20n%E1%BB%89%20m%C3%A8o/brtf460swz1hdpis8tkd.jpg','Bóng nỉ mèo/brtf460swz1hdpis8tkd',11003,3),(13,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755526672/B%C3%B3ng%20n%E1%BB%89%20m%C3%A8o/ztogow5bpcbowlkzgdnt.jpg','Bóng nỉ mèo/ztogow5bpcbowlkzgdnt',4935,3),(14,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755526674/B%C3%B3ng%20n%E1%BB%89%20m%C3%A8o/kndi29i9qak7nzlhfa5v.jpg','Bóng nỉ mèo/kndi29i9qak7nzlhfa5v',6245,3),(15,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755526676/B%C3%B3ng%20n%E1%BB%89%20m%C3%A8o/b63rlaprag4nbb3skrti.jpg','Bóng nỉ mèo/b63rlaprag4nbb3skrti',8604,3),(23,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755745949/Nutrience%20Originrereal/cbuugp6ixldbvgbhq0rz.webp','Nutrience Originrereal/cbuugp6ixldbvgbhq0rz',13322,6),(24,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755745950/Nutrience%20Originrereal/suvur1jdwrydheqmcmlb.webp','Nutrience Originrereal/suvur1jdwrydheqmcmlb',29054,6),(25,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755745952/Nutrience%20Originrereal/pyxjrdc3qin1hvgu3iqz.jpg','Nutrience Originrereal/pyxjrdc3qin1hvgu3iqz',15094,6),(26,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755745953/Nutrience%20Originrereal/rccrd9b3v0ylh7x27bg7.webp','Nutrience Originrereal/rccrd9b3v0ylh7x27bg7',19208,6),(27,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755745955/Nutrience%20Originrereal/lmre7vx8rhdehuirdyep.jpg','Nutrience Originrereal/lmre7vx8rhdehuirdyep',93540,6),(48,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755746199/Th%E1%BB%A9c%20%C4%83n%20kh%C3%B4%20cho%20ch%C3%B3%20SmartHeart/bicgwpzzaunhztfqermx.jpg','Thức ăn khô cho chó SmartHeart/bicgwpzzaunhztfqermx',10220,7),(49,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755746200/Th%E1%BB%A9c%20%C4%83n%20kh%C3%B4%20cho%20ch%C3%B3%20SmartHeart/ailpkaxgza3mgjwf9iz9.jpg','Thức ăn khô cho chó SmartHeart/ailpkaxgza3mgjwf9iz9',11522,7),(50,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755746202/Th%E1%BB%A9c%20%C4%83n%20kh%C3%B4%20cho%20ch%C3%B3%20SmartHeart/ysmidwdl0nxh9ttgsdak.jpg','Thức ăn khô cho chó SmartHeart/ysmidwdl0nxh9ttgsdak',14562,7),(51,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755746203/Th%E1%BB%A9c%20%C4%83n%20kh%C3%B4%20cho%20ch%C3%B3%20SmartHeart/t9be8zkblbbq1e4epwjg.jpg','Thức ăn khô cho chó SmartHeart/t9be8zkblbbq1e4epwjg',7930,7),(52,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1755746204/Th%E1%BB%A9c%20%C4%83n%20kh%C3%B4%20cho%20ch%C3%B3%20SmartHeart/dpvsfisds9prszfa8p91.jpg','Thức ăn khô cho chó SmartHeart/dpvsfisds9prszfa8p91',9315,7),(57,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1764296171/ACANA%20Singles%20Grain%20Free%20Limited%20Ingredient%20Diet%20Duck%20and%20Pear%20Formula%20Dog%20Treats/hpsbahspolhwghnru5io.webp','ACANA Singles Grain Free Limited Ingredient Diet Duck and Pear Formula Dog Treats/hpsbahspolhwghnru5io',60886,14),(59,'http://res.cloudinary.com/dsnp27eeq/image/upload/v1764297385/product/wlvis608opk1mw5b7g82.png','product/wlvis608opk1mw5b7g82',851751,22);
+/*!40000 ALTER TABLE `images` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `order_details`
+--
+
+DROP TABLE IF EXISTS `order_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_details` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint NOT NULL,
+  `product_id` bigint NOT NULL,
+  `quantity` bigint NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `total_price` decimal(38,2) DEFAULT NULL,
+  `variant_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `order_id` (`order_id`),
+  KEY `product_id` (`product_id`),
+  KEY `FK6tgk3brltuamkejs4d07g8gnj` (`variant_id`),
+  CONSTRAINT `FK6tgk3brltuamkejs4d07g8gnj` FOREIGN KEY (`variant_id`) REFERENCES `variants` (`id`),
+  CONSTRAINT `order_details_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `order_details_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order_details`
+--
+
+LOCK TABLES `order_details` WRITE;
+/*!40000 ALTER TABLE `order_details` DISABLE KEYS */;
+INSERT INTO `order_details` VALUES (1,2,1,2,130000.00,260000.00,2),(2,2,3,3,50000.00,150000.00,8),(3,3,3,2,30000.00,60000.00,8),(4,4,1,2,70000.00,140000.00,1),(5,5,3,2,50000.00,100000.00,8),(6,6,1,2,140000.00,280000.00,4),(7,7,1,2,150000.00,300000.00,3),(8,8,1,1,130000.00,130000.00,2),(9,8,7,1,150000.00,150000.00,7),(10,8,1,1,140000.00,140000.00,3),(11,8,1,1,70000.00,70000.00,1),(12,9,1,1,70000.00,70000.00,1),(15,12,3,1,29000.00,29000.00,8),(19,16,2,1,142000.00,142000.00,9),(20,17,1,1,70000.00,70000.00,1),(21,18,3,4,29000.00,116000.00,8),(22,18,1,4,130000.00,520000.00,2),(23,19,1,1,70001.00,70001.00,1),(24,20,7,1,150000.00,150000.00,7),(46,39,7,6,100000.00,600000.00,12),(50,43,3,1,29000.00,29000.00,8),(51,44,6,1,35000.00,35000.00,6),(52,45,3,1,29000.00,29000.00,8),(53,46,1,1,70001.00,70001.00,1),(54,47,3,1,29000.00,29000.00,8),(55,48,3,1,29000.00,29000.00,8),(56,49,14,1,100000.00,100000.00,19),(57,50,14,1,100000.00,100000.00,19),(58,51,14,1,110000.00,110000.00,19);
+/*!40000 ALTER TABLE `order_details` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `orders`
+--
+
+DROP TABLE IF EXISTS `orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `orders` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint DEFAULT NULL,
+  `session_id` varchar(50) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `phone_number` varchar(12) NOT NULL,
+  `total_amount` decimal(10,2) DEFAULT NULL,
+  `note` text,
+  `order_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('PENDING','CONFIRMED','SHIPPING','COMPLETED','CANCELED','FAILED_PAYMENT','NOT_RECEIVED') DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `orders`
+--
+
+LOCK TABLES `orders` WRITE;
+/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES (2,1,NULL,'ndnam','0936106205',330000.00,'Test','2025-08-19 09:12:55','COMPLETED'),(3,NULL,'6c07e09d-808a-4f65-afa7-d8b5174e848c','test','00000000000',60000.00,'test session','2025-08-19 10:25:10','CANCELED'),(4,NULL,'6c07e09d-808a-4f65-afa7-d8b5174e848c','teasdasst','000000000',140000.00,'test sessdasion','2025-08-19 10:29:03','PENDING'),(5,1,NULL,'ndnam','0936106205',100000.00,'Tamj','2025-08-23 14:10:23','CONFIRMED'),(6,1,NULL,'ndnam','0936106205',180000.00,'Tamj','2025-08-28 15:01:29','PENDING'),(7,1,NULL,'nam','0936106205',180000.00,'Tamj','2025-08-28 15:04:32','SHIPPING'),(8,6,NULL,'nguyenquanganh0704204','0966987451',490000.00,'rew','2025-09-09 06:48:13','PENDING'),(9,6,NULL,'nguyenquanganh0704204','0966987451',70000.00,'1','2025-09-09 06:48:32','PENDING'),(12,6,NULL,'nguyenquanganh0704204','0966987451',29000.00,'3','2025-09-09 07:07:15','PENDING'),(16,6,NULL,'nguyenquanganh0704204','0966987451',142000.00,NULL,'2025-09-09 07:15:36','CANCELED'),(17,6,NULL,'nguyenquanganh0704204','0966987451',70000.00,'1','2025-10-21 06:56:09','COMPLETED'),(18,6,NULL,'nguyenquanganh0704204','0966987451',29000.00,'1','2025-10-30 14:39:19','COMPLETED'),(19,6,NULL,'nguyenquanganh0704204','0966987451',70001.00,'Đmm nam','2025-11-02 14:18:46','COMPLETED'),(20,6,NULL,'nguyenquanganh0704204','0966987451',150000.00,'Giao','2025-11-03 05:58:01','COMPLETED'),(39,6,NULL,'Nguyễn Quang Anh','0966987451',600000.00,'45234543','2025-11-04 08:38:29','COMPLETED'),(43,6,NULL,'fsdfsdf','0966987451',29000.00,'fsdfds','2025-11-05 02:59:54','CONFIRMED'),(44,6,NULL,'Nguyễn Văn C','0966987451',35000.00,'Giao đi','2025-11-05 03:07:12','PENDING'),(45,6,NULL,'dấd','0966987451',29000.00,'4234234','2025-11-05 07:19:50','PENDING'),(46,6,NULL,'Nguyen Quang Anh','0966987451',70001.00,'rwerew','2025-11-17 04:22:49','PENDING'),(47,50,NULL,'fsfds','2613edd3-6',29000.00,'đá','2025-11-20 03:33:46','NOT_RECEIVED'),(48,6,NULL,'Nguyễn Quang Anh','0966987451',29000.00,'Hà Nội','2025-11-21 13:54:07','PENDING'),(49,51,NULL,'Nguyeenx van test','0965693740',100000.00,'dasd','2025-11-28 14:01:19','CANCELED'),(50,51,NULL,'dấd','0965693740',100000.00,'đasadsadsa','2025-11-28 14:19:26','CANCELED'),(51,51,NULL,'Nguyen van test','0965693740',110000.00,'sdfds','2025-11-28 14:33:07','COMPLETED');
+/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_reset_token`
+--
+
+DROP TABLE IF EXISTS `password_reset_token`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_reset_token` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `expiry_date` datetime(6) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `used` bit(1) NOT NULL,
+  `user_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK83nsrttkwkb6ym0anu051mtxn` (`user_id`),
+  CONSTRAINT `FK83nsrttkwkb6ym0anu051mtxn` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_reset_token`
+--
+
+LOCK TABLES `password_reset_token` WRITE;
+/*!40000 ALTER TABLE `password_reset_token` DISABLE KEYS */;
+INSERT INTO `password_reset_token` VALUES (1,'2025-11-17 11:13:36.192382','2dacf0d3-3637-4368-bcdf-261ddc68a54b',_binary '\0',49),(2,'2025-11-17 11:18:49.047788','716d95cd-9c59-490e-ab22-387ab4e9dcc8',_binary '',6);
+/*!40000 ALTER TABLE `password_reset_token` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `payments`
+--
+
+DROP TABLE IF EXISTS `payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `payments` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `order_id` bigint DEFAULT NULL,
+  `payment_date` date DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `payment_method` enum('COD','MOMO','ZALOPAY','VNPAY','CREDIT_CARD') NOT NULL,
+  `payment_status` enum('PENDING','SUCCESS','FAILED','CANCELLED') DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `order_id` (`order_id`),
+  CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `payments_chk_1` CHECK ((`payment_status` between 0 and 3))
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `payments`
+--
+
+LOCK TABLES `payments` WRITE;
+/*!40000 ALTER TABLE `payments` DISABLE KEYS */;
+INSERT INTO `payments` VALUES (1,2,'2025-08-19',330000.00,'COD',NULL),(2,3,'2025-08-19',60000.00,'COD',NULL),(3,4,'2025-08-19',140000.00,'COD',NULL),(4,5,'2025-08-23',100000.00,'COD',NULL),(5,6,'2025-08-28',180000.00,'COD',NULL),(6,7,'2025-08-28',180000.00,'COD',NULL),(7,8,'2025-09-09',490000.00,'COD',NULL),(8,9,'2025-09-09',70000.00,'COD',NULL),(11,12,'2025-09-09',29000.00,'COD',NULL),(15,16,'2025-09-09',142000.00,'COD',NULL),(16,17,'2025-10-21',70000.00,'COD',NULL),(17,18,'2025-10-30',29000.00,'COD',NULL),(18,19,'2025-11-02',70001.00,'COD',NULL),(19,20,'2025-11-03',150000.00,'COD',NULL),(42,39,'2025-11-04',600000.00,'VNPAY','SUCCESS'),(46,43,'2025-11-05',29000.00,'COD','PENDING'),(47,44,'2025-11-05',35000.00,'COD',NULL),(48,45,'2025-11-05',29000.00,'VNPAY','FAILED'),(49,46,'2025-11-17',70001.00,'VNPAY','SUCCESS'),(50,47,'2025-11-20',29000.00,'COD',NULL),(51,48,'2025-11-21',29000.00,'COD',NULL),(52,49,'2025-11-28',100000.00,'COD',NULL),(53,50,'2025-11-28',100000.00,'COD',NULL),(54,51,'2025-11-28',110000.00,'COD',NULL);
+/*!40000 ALTER TABLE `payments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pet_examination`
+--
+
+DROP TABLE IF EXISTS `pet_examination`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pet_examination` (
+  `appointment_id` bigint NOT NULL,
+  `examination_id` bigint NOT NULL,
+  KEY `FK8308i0ltp1hlbbqv7rmliqva7` (`examination_id`),
+  KEY `FKcp117d0xv2quixbt7ndh2s4bl` (`appointment_id`),
+  CONSTRAINT `FK8308i0ltp1hlbbqv7rmliqva7` FOREIGN KEY (`examination_id`) REFERENCES `examination` (`id`),
+  CONSTRAINT `FKcp117d0xv2quixbt7ndh2s4bl` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pet_examination`
+--
+
+LOCK TABLES `pet_examination` WRITE;
+/*!40000 ALTER TABLE `pet_examination` DISABLE KEYS */;
+INSERT INTO `pet_examination` VALUES (14,1),(14,2),(14,3),(14,4),(16,1),(16,2),(15,1),(15,2),(17,1),(17,2);
+/*!40000 ALTER TABLE `pet_examination` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `product_reviews`
+--
+
+DROP TABLE IF EXISTS `product_reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `product_reviews` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `comment` text,
+  `created_at` datetime(6) DEFAULT NULL,
+  `rating` int NOT NULL,
+  `status` enum('PENDING','APPROVED','REJECTED','ARCHIVED') DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `order_id` bigint NOT NULL,
+  `product_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `variant_id` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKkpu8o8nqopc4lcqcfnnlpq5vg` (`order_id`),
+  KEY `FK35kxxqe2g9r4mww80w9e3tnw9` (`product_id`),
+  KEY `FK58i39bhws2hss3tbcvdmrm60f` (`user_id`),
+  KEY `FKpiq4gpmf78nhpsyhpgfvgrw6t` (`variant_id`),
+  CONSTRAINT `FK35kxxqe2g9r4mww80w9e3tnw9` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
+  CONSTRAINT `FK58i39bhws2hss3tbcvdmrm60f` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `FKkpu8o8nqopc4lcqcfnnlpq5vg` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
+  CONSTRAINT `FKpiq4gpmf78nhpsyhpgfvgrw6t` FOREIGN KEY (`variant_id`) REFERENCES `variants` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product_reviews`
+--
+
+LOCK TABLES `product_reviews` WRITE;
+/*!40000 ALTER TABLE `product_reviews` DISABLE KEYS */;
+INSERT INTO `product_reviews` VALUES (1,'Sản phẩm rất tốt, đúng mô tả, giao hàng nhanh!','2025-11-03 11:09:58.505142',5,'APPROVED',NULL,19,1,6,1),(2,'Quá tốt','2025-11-03 12:13:13.702814',5,'APPROVED',NULL,18,3,6,8),(3,'cũng được','2025-11-03 12:58:18.593694',3,'APPROVED',NULL,20,7,6,7),(4,'mua lần thứ n','2025-11-03 13:06:10.129867',5,'APPROVED',NULL,18,1,6,2),(5,'tốt','2025-11-04 15:43:31.467910',5,'APPROVED',NULL,39,7,6,12),(6,'ok đó','2025-12-01 14:04:19.514545',4,'APPROVED',NULL,51,14,51,19);
+/*!40000 ALTER TABLE `product_reviews` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `products`
+--
+
+DROP TABLE IF EXISTS `products`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `products` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
+  `description` text,
+  `status` enum('AVAILABLE','OUT_OF_STOCK','DISCONTINUED') NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `category_id` bigint DEFAULT NULL,
+  `average_rating` double DEFAULT NULL,
+  `slug` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `category_id` (`category_id`),
+  CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `products`
+--
+
+LOCK TABLES `products` WRITE;
+/*!40000 ALTER TABLE `products` DISABLE KEYS */;
+INSERT INTO `products` VALUES (1,'Nutrience Original','http://res.cloudinary.com/dsnp27eeq/image/upload/v1755443014/wjuvgu5qovvlocbc8oh7.webp','Thức ăn trung cấp đến cao, thành phần gồm thịt gà, cá, rau củ, cân bằng dinh dưỡng cho mọi giống chó.','AVAILABLE','2025-08-17 15:17:24','2025-11-21 11:32:34',1,NULL,'nutrience-original'),(2,'Royal Canin Medium Puppy','http://res.cloudinary.com/dsnp27eeq/image/upload/v1755445925/Royal%20Canin%20Medium%20Puppy/olnpdsueaxuaj4tfpubq.jpg','Thức ăn cho chó con giống vừa, tăng cường hệ miễn dịch, hỗ trợ tiêu hóa khỏe mạnh.','AVAILABLE','2025-08-17 15:52:05','2025-08-17 15:52:05',1,NULL,'royal-canin-medium-puppy'),(3,'Bóng nỉ mèo','http://res.cloudinary.com/dsnp27eeq/image/upload/v1755526667/B%C3%B3ng%20n%E1%BB%89%20m%C3%A8o/lddtm50upmtaxaebwf6e.jpg','Bóng nỉ mềm, an toàn cho mèo chơi, giúp mèo vận động và vui chơi giải trí.','AVAILABLE','2025-08-18 14:17:47','2025-08-18 14:17:47',2,NULL,'bong-ni-meo'),(6,'Nutrience Originrereal','http://res.cloudinary.com/dsnp27eeq/image/upload/v1755745949/Nutrience%20Originrereal/cbuugp6ixldbvgbhq0rz.webp','Thức ăn trung cấp đến cao, thành phần gồm thịt gà, cá, rau củ, cân bằng dinh dưỡng cho mọi giống chó.','AVAILABLE','2025-08-19 08:41:30','2025-08-21 03:12:26',2,NULL,'nutrience-originrereal'),(7,'Thức ăn khô cho chó SmartHeart','http://res.cloudinary.com/dsnp27eeq/image/upload/v1755746199/Th%E1%BB%A9c%20%C4%83n%20kh%C3%B4%20cho%20ch%C3%B3%20SmartHeart/bicgwpzzaunhztfqermx.jpg','Thức ăn hạt dinh dưỡng cho chó trưởng thành, bổ sung canxi và omega-3 giúp lông mượt và xương chắc khỏe.','AVAILABLE','2025-08-21 03:16:39','2025-09-04 04:30:07',1,NULL,'thuc-an-kho-cho-cho-smartheart'),(14,'ACANA Singles Grain Free Limited Ingredient Diet Duck and Pear Formula Dog Treats','http://res.cloudinary.com/dsnp27eeq/image/upload/v1764296171/ACANA%20Singles%20Grain%20Free%20Limited%20Ingredient%20Diet%20Duck%20and%20Pear%20Formula%20Dog%20Treats/hpsbahspolhwghnru5io.webp','Perfectly sized training bites to reward all those sitting pups, those instagram posing mutts, and the slightly naughtier puppies who need a little daily bribing. Buy this product on petsonbroadwaynyc.com','AVAILABLE','2025-11-28 02:16:13','2025-11-28 14:18:34',1,NULL,'acana-singles-grain-free-limited-ingredient-diet-duck-and-pear-formula-dog-treats'),(22,' API® Freshwater Aquarium Master Test Kit','http://res.cloudinary.com/dsnp27eeq/image/upload/v1764297385/product/wlvis608opk1mw5b7g82.png','DESCRIPTION This API Freshwater Master Test Kit is the perfect way to make certain the water in your freshwater aquarium is clean and safe. This kit tests tap water and aquarium water for five different parameters that affect the health of freshwater fish. Compact and easy to store, this kit can conduct over 800 tests. Features: Helps monitor water quality and prevent invisible water problems that can be harmful to fish and cause fish loss Accurately monitors 5 most vital water parameters levels in freshwater aquariums: pH, high range pH, ammonia, nitrite, nitrate Designed for use in freshwater aquariums only Use for weekly monitoring and when water or fish problems appear Includes: Contains one (1) API FRESHWATER MASTER TEST KIT 800-Test Freshwater Aquarium Water Master Test Kit, including 7 bottles of testing solutions, 1 color card and 4 glass tubes with cap Intended Pet(s): Fish Product Dimensions: 7 in x 5 in x 4.25 in Capacity: 1 CT Buy this product on petsmart.com','AVAILABLE','2025-11-28 02:36:24','2025-11-28 02:36:24',1,NULL,'api-freshwater-aquarium-master-test-kit');
+/*!40000 ALTER TABLE `products` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `roles`
+--
+
+DROP TABLE IF EXISTS `roles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `roles` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `roles`
+--
+
+LOCK TABLES `roles` WRITE;
+/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
+INSERT INTO `roles` VALUES (1,'ADMIN'),(2,'USER'),(3,'DOCTOR'),(4,'CUSTOMER');
+/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone_number` varchar(12) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `role_id` bigint DEFAULT NULL,
+  `provider` varchar(255) DEFAULT NULL,
+  `veterinarian_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `phone_number` (`phone_number`),
+  UNIQUE KEY `UK_sfpo5twue4g14h96dyy2d7ixk` (`veterinarian_id`),
+  KEY `role_id` (`role_id`),
+  CONSTRAINT `FKb1f1x18uaa6as2tvwyh8aecur` FOREIGN KEY (`veterinarian_id`) REFERENCES `veterinarians` (`id`),
+  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'ndnam','nam08122004@gmail.com','$2a$10$kiXmL3EUN8CC16g16TmQ6OEDdbVdKFdGv9hiuvbqr33nLx81Itneu','0936106205','2025-08-15 13:38:38','2025-08-15 13:38:38',2,NULL,NULL),(6,'nguyenquanganh07042004','nguyenquanganh07042004@gmail.com','$2a$10$I.XXAhZzS0icfgQk3VRlVumTk0jCowE5NcVM0JCPkBrC4rc3.GcYi','0966987451','2025-09-02 14:22:32','2025-11-17 04:14:32',1,NULL,NULL),(9,'huu336192','huu336192@gmail.com','9c1625c6-9a58-4ad9-8906-5ab09fb554d9','google','2025-11-17 03:09:09','2025-09-02 14:22:32',4,'google',NULL),(49,'dangcapnr2','dangcapnr2@gmail.com','449b943f-5614-453d-875f-175ba12a9b25','b682cfee-3','2025-11-17 04:05:43','2025-09-02 14:22:32',2,'google',NULL),(50,'nguyenquanganh0704204','nguyenquanganh0704204@gmail.com','b0184754-39e9-4889-a8a8-acd358bdf6c7','2613edd3-6','2025-11-20 03:25:37','2025-11-20 03:25:37',3,'google',1),(51,'test01','test01@dev.com','$2a$10$gW1zeE7A2iJFeTIuphqEn..SWznl4k1C7MyFl.MEktUAQxsF.AjAi','0965693740','2025-11-28 02:11:04','2025-11-28 02:11:04',4,NULL,NULL);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `variants`
+--
+
+DROP TABLE IF EXISTS `variants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `variants` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `price` decimal(38,2) DEFAULT NULL,
+  `size` varchar(255) DEFAULT NULL,
+  `stock` bigint DEFAULT NULL,
+  `product_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK95bued017vcya4rf4s7n31ew4` (`product_id`),
+  CONSTRAINT `FK95bued017vcya4rf4s7n31ew4` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `variants`
+--
+
+LOCK TABLES `variants` WRITE;
+/*!40000 ALTER TABLE `variants` DISABLE KEYS */;
+INSERT INTO `variants` VALUES (1,70001.00,'100g',6,1),(2,130000.00,'200g',28,1),(3,140000.00,'400g',50,1),(4,150000.00,'1kg',323,1),(6,35000.00,'200g',3443,6),(7,150000.00,'200g',23,7),(8,29000.00,'400',216,3),(9,142000.00,'200g',29,2),(11,160000.00,'400g',4333,2),(12,100000.00,'100g',3,7),(19,110000.00,'100g',0,14),(20,120000.00,'500g',34,14),(21,200000.00,'1kg',23,14),(34,50000.00,'100g',12,22),(35,70000.00,'200g',23,22),(36,120000.00,'1kg',14,22);
+/*!40000 ALTER TABLE `variants` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `veterinarians`
+--
+
+DROP TABLE IF EXISTS `veterinarians`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `veterinarians` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `email` varchar(50) DEFAULT NULL,
+  `phone_number` varchar(12) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `user_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_i71b2hki7hnf0mqimb8u8723i` (`user_id`),
+  CONSTRAINT `FKc0848sr3veps5xqnxchutpd3n` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `veterinarians`
+--
+
+LOCK TABLES `veterinarians` WRITE;
+/*!40000 ALTER TABLE `veterinarians` DISABLE KEYS */;
+INSERT INTO `veterinarians` VALUES (1,'Nguyễn Doãn Nam','nam08122004@gmail.com','0936106205','2025-08-29 10:54:32','2025-08-29 10:54:32',NULL),(2,'Nguyễn Văn A','nguyenvana@example.com','0912345678','2025-08-29 10:54:32','2025-08-29 10:54:32',NULL),(3,'Ngô Thị B','ntb123@gmail.com','0123456789','2025-08-30 14:35:15','2025-08-30 14:37:16',NULL);
+/*!40000 ALTER TABLE `veterinarians` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-12-01 14:59:47
