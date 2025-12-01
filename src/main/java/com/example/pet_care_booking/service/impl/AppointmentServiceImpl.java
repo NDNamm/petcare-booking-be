@@ -94,8 +94,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .note(dto.getNote())
                 .totalPrice(totalPrice.get())
                 .examination(exList)
-                .startTime(LocalDateTime.now())
-                .endTime(LocalDateTime.now().plusMinutes(30))
+                .startTime(dto.getStart())
+                .endTime(dto.getStart().plusMinutes(30))
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now());
 
