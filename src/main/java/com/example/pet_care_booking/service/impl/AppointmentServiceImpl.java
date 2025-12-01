@@ -401,11 +401,11 @@ public class AppointmentServiceImpl implements AppointmentService {
             totalTable.addCell(subtotalValue);
 
             // Discount Row (if any)
-            PdfPCell discountLabel = new PdfPCell(new Phrase("Giam gia:", boldFont));
-            discountLabel.setBorder(Rectangle.NO_BORDER);
-            discountLabel.setPadding(8f);
-            discountLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
-            totalTable.addCell(discountLabel);
+//            PdfPCell discountLabel = new PdfPCell(new Phrase("Giam gia:", boldFont));
+//            discountLabel.setBorder(Rectangle.NO_BORDER);
+//            discountLabel.setPadding(8f);
+//            discountLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
+//            totalTable.addCell(discountLabel);
 
             PdfPCell discountValue = new PdfPCell(new Phrase("0 VND", normalFont));
             discountValue.setBorder(Rectangle.NO_BORDER);
