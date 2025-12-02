@@ -31,7 +31,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ApiResponse<Void> register(@Valid @RequestBody UserDTO user) {
+    public ApiResponse<Void> register( @RequestBody UserDTO user) {
         ApiResponse<Void> response = new ApiResponse<>();
         authService.register(user);
         response.setMessage("Đăng kí tài khoản thành công");
