@@ -47,31 +47,8 @@ public class User {
     @JsonIgnore
     private List<Appointments> appointments;
 
-    @OneToOne
+    @OneToOne(mappedBy = "user")
+    @JsonIgnore
     private Veterinarians veterinarian;
-//
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return true;
-//    }
+
 }

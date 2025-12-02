@@ -46,14 +46,32 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Page<AppointmentsDTO> getAppointments(String ownerName, String phoneNumber, String email,
                                                  String petName, String vetName, String status,
-                                                 int page, int size) {
+                                                 int page, int size, Long userId) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (user.getRole().getName().equals("DOCTOR")) {
+            Veterinarians veterinarians = veterinarianRepository.findByUser(user);
+            Page<Appointments> pages = appointmentRepository.findAppointmentsByUser(ownerName, phoneNumber, email, petName, vetName, status, veterinarians.getId(), pageable);
+            return pages.map(this::getAppointment);
+        }
         Page<Appointments> apps = (ownerName == null && phoneNumber == null &&
                 email == null && petName == null && vetName == null && status == null)
                 ? appointmentRepository.findAll(pageable)
                 : appointmentRepository.searchAppointment(ownerName, phoneNumber, email, petName, vetName, status, pageable);
 
         return apps.map(this::getAppointment);
+    }
+
+    @Override
+    public Page<AppointmentsDTO> getAppointmentsByDoctor(String ownerName, String phoneNumber, String email, String petName, String vetName, String status, int page, int size, Long userId) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        Veterinarians veterinarians = veterinarianRepository.findByUser(user);
+        Page<Appointments> pages = appointmentRepository.findAppointmentsByUser(ownerName, phoneNumber, email, petName, vetName, status, veterinarians.getId(), pageable);
+        return pages.map(this::getAppointment);
     }
 
     @Override
@@ -188,6 +206,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         app.setUpdatedAt(LocalDateTime.now());
         appointmentRepository.save(app);
     }
+
     public static String removeAccent(String s) {
         // Chuyển về dạng NFD (decompose)
         String temp = Normalizer.normalize(s, Normalizer.Form.NFD);

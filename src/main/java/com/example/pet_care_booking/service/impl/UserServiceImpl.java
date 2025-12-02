@@ -6,8 +6,10 @@ import com.example.pet_care_booking.exception.AppException;
 import com.example.pet_care_booking.exception.ErrorCode;
 import com.example.pet_care_booking.modal.Role;
 import com.example.pet_care_booking.modal.User;
+import com.example.pet_care_booking.modal.Veterinarians;
 import com.example.pet_care_booking.repository.RoleRepository;
 import com.example.pet_care_booking.repository.UserRepository;
+import com.example.pet_care_booking.repository.VeterinarianRepository;
 import com.example.pet_care_booking.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +29,7 @@ public class UserServiceImpl implements UserService {
    private final UserRepository userRepository;
    private final RoleRepository roleRepository;
    private final PasswordEncoder passwordEncoder;
-
+    private final VeterinarianRepository veterinarianRepository;
    @Override
    public Page<UserDTO> getAllUsers(String name, String email, String phoneNumber, int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
@@ -94,8 +96,19 @@ public class UserServiceImpl implements UserService {
    public void deleteUser(Long id) {
       User user = userRepository.findById(id)
              .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+       Veterinarians vet = veterinarianRepository.findByUser(user);
+       if(vet != null){
+           vet.setUser(null);
+           veterinarianRepository.save(vet);
 
-      userRepository.delete(user);
+           // Xóa User
+           userRepository.delete(user);
+
+           // Xóa Vet sau nếu muốn
+           veterinarianRepository.delete(vet);
+       }else{
+           userRepository.delete(user);
+       }
    }
 
 

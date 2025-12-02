@@ -28,7 +28,7 @@ public class AppointmentsController {
     private final AppointmentService appointmentService;
 
     //Admin
-    @GetMapping("")
+    @GetMapping("/{userId}")
     public ApiResponse<Page<AppointmentsDTO>> getAllAppointments(@RequestParam(required = false) String ownerName,
                                                                  @RequestParam(required = false) String phoneNumber,
                                                                  @RequestParam(required = false) String email,
@@ -36,11 +36,27 @@ public class AppointmentsController {
                                                                  @RequestParam(required = false) String vetName,
                                                                  @RequestParam(required = false) String status,
                                                                  @RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "10") int size) {
+                                                                 @RequestParam(defaultValue = "10") int size,
+                                                                 @PathVariable Long userId) {
         ApiResponse<Page<AppointmentsDTO>> apiResponse = new ApiResponse<>();
-        apiResponse.setData(appointmentService.getAppointments(ownerName, phoneNumber, email, petName, vetName, status, page, size));
+        apiResponse.setData(appointmentService.getAppointments(ownerName, phoneNumber, email, petName, vetName, status, page, size, userId));
         return apiResponse;
     }
+
+//    @GetMapping("/doctor/{userId}")
+//    public ApiResponse<Page<AppointmentsDTO>> getAllAppointmentsByDoctor(@RequestParam(required = false) String ownerName,
+//                                                                         @RequestParam(required = false) String phoneNumber,
+//                                                                         @RequestParam(required = false) String email,
+//                                                                         @RequestParam(required = false) String petName,
+//                                                                         @RequestParam(required = false) String vetName,
+//                                                                         @RequestParam(required = false) String status,
+//                                                                         @RequestParam(defaultValue = "0") int page,
+//                                                                         @RequestParam(defaultValue = "10") int size,
+//                                                                         @PathVariable Long userId) {
+//        ApiResponse<Page<AppointmentsDTO>> apiResponse = new ApiResponse<>();
+//        apiResponse.setData(appointmentService.getAppointmentsByDoctor(ownerName, phoneNumber, email, petName, vetName, status, page, size, userId));
+//        return apiResponse;
+//    }
 
     @PutMapping("/update/{id}")
     public ApiResponse<AppointmentsDTO> updateAppointment(@RequestBody AppointmentsDTO dto,

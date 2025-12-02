@@ -1,6 +1,7 @@
 package com.example.pet_care_booking.repository;
 
 import com.example.pet_care_booking.modal.Appointments;
+import com.example.pet_care_booking.modal.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -53,10 +54,33 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
 
     @Query("SELECT a FROM Appointments a " +
             "WHERE a.startTime < :end AND a.endTime > :start "
-            )
+    )
     List<Appointments> findConflictingAppointments(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
 
+    @Query("SELECT a FROM Appointments a " +
+            " JOIN a.veterinarian v " +
+            "WHERE (:ownerName IS NULL OR LOWER(a.ownerName) LIKE LOWER(CONCAT('%', :ownerName, '%'))) " +
+            "AND (:phoneNumber IS NULL OR LOWER(a.phoneNumber) LIKE LOWER(CONCAT('%', :phoneNumber, '%'))) " +
+            "AND (:email IS NULL OR LOWER(a.email) LIKE LOWER(CONCAT('%', :email, '%'))) " +
+            "AND (:petName IS NULL OR LOWER(a.petName) LIKE LOWER(CONCAT('%', :petName, '%'))) " +
+            "AND (:vetName IS NULL OR LOWER(v.name) LIKE LOWER(CONCAT('%', :vetName, '%'))) " +
+            "AND (:status IS NULL OR LOWER(a.appointStatus) LIKE LOWER(CONCAT('%', :status, '%'))) " +
+            "AND a.veterinarian.id = :userId")
+    Page<Appointments> findAppointmentsByUser(
+            @Param("ownerName") String ownerName,
+            @Param("phoneNumber") String phoneNumber,
+            @Param("email") String email,
+            @Param("petName") String petName,
+            @Param("vetName") String vetName,
+            @Param("status") String status,
+            @Param("userId") Long userId,
+            Pageable pageable
+    );
+
+
+
+    Long user(User user);
 }
 

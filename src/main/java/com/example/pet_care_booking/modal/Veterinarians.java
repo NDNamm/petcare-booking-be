@@ -38,6 +38,9 @@ public class Veterinarians {
     @OneToMany(mappedBy = "veterinarian", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Appointments> appointment;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
     private User user;
+
+
 }

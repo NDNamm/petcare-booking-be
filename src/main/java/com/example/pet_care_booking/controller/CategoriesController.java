@@ -21,7 +21,7 @@ public class CategoriesController {
    @GetMapping("")
    public ApiResponse<Page<CategoriesDTO>> getAllCategory(@RequestParam(required = false) String name,
                                                           @RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "5") int size) {
+                                                          @RequestParam(defaultValue = "20") int size) {
 
       ApiResponse<Page<CategoriesDTO>> response = new ApiResponse<>();
       response.setData(categoriesService.getAllCate(name, page, size));

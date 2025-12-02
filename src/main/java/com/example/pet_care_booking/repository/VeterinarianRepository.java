@@ -1,5 +1,6 @@
 package com.example.pet_care_booking.repository;
 
+import com.example.pet_care_booking.modal.User;
 import com.example.pet_care_booking.modal.Veterinarians;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,4 +24,5 @@ public interface VeterinarianRepository extends JpaRepository<Veterinarians, Lon
                                  Pageable pageable);
 
   boolean existsByEmailAndPhoneNumber(String email, String phoneNumber);
+  Veterinarians findByUser(User user);
 }

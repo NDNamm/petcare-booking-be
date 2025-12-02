@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AppointmentService {
-    Page<AppointmentsDTO> getAppointments(String ownerName, String phoneNumber, String email, String petName, String vetName, String status, int page, int size);
+    Page<AppointmentsDTO> getAppointments(String ownerName, String phoneNumber, String email, String petName, String vetName, String status, int page, int size, Long userId);
+    Page<AppointmentsDTO> getAppointmentsByDoctor(String ownerName, String phoneNumber, String email, String petName, String vetName, String status, int page, int size, Long userId);
 
     void updateAppointment(Long id, AppointmentsDTO appointmentsDTO);
 
