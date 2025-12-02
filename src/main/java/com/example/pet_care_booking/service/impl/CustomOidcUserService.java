@@ -30,7 +30,7 @@ public class CustomOidcUserService implements OAuth2UserService<OidcUserRequest,
         OidcUser user = new OidcUserService().loadUser(userRequest);
         String email = user.getAttribute("email");
         String username = email.split("@")[0];
-        Role role = roleRepository.findById(2L)
+        Role role = roleRepository.findById(4L)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
         String phone = UUID.randomUUID().toString();
         User user2 = userRepository.findUserByEmail(email)
