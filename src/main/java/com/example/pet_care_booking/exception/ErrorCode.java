@@ -12,7 +12,9 @@ public enum ErrorCode {
    INVALID_KEY(9999, "ERROR", HttpStatus.BAD_REQUEST),
 
    EMAIL_EXISTED(1001, "Email already exists", HttpStatus.BAD_REQUEST),
-   PHONE_EXISTED(1009, "Phone already exists", HttpStatus.BAD_REQUEST),
+    GMAIL_PASSWORD_CHANGE_NOT_ALLOWED(10003, "Cannot change password for Gmail account", HttpStatus.FORBIDDEN),
+
+    PHONE_EXISTED(1009, "Phone already exists", HttpStatus.BAD_REQUEST),
    PASSWORD_NOT_MATCH(1002, "Passwords do not match", HttpStatus.BAD_REQUEST),
    USER_NOT_FOUND(1003, "User not found", HttpStatus.NOT_FOUND),
     USER_NAME_EXIST(1011, "username exist", HttpStatus.BAD_REQUEST),

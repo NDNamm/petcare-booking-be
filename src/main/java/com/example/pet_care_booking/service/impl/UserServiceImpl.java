@@ -132,7 +132,9 @@ public class UserServiceImpl implements UserService {
 
             user.setPhoneNumber(userDTO.getPhoneNumber());
         }
-
+        if(user.getProvider().equals("google")){
+            throw new AppException(ErrorCode.GMAIL_PASSWORD_CHANGE_NOT_ALLOWED);
+        }
         if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
 
             if (!bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
