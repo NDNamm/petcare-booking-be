@@ -57,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
                 user.getId(),
                 user.getUserName(),
                 user.getEmail(),
+                user.getProvider(),
                 user.getPhoneNumber(),
                 user.getRole().getName(),
                 accessToken
@@ -138,6 +139,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return AuthDTO.builder()
                 .userId(user.getId())
+                .provide(user.getProvider())
                 .userName(user.getUserName())
                 .phoneNumber(user.getPhoneNumber())
                 .nameRole(user.getRole().getName())
