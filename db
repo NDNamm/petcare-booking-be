@@ -81,7 +81,7 @@ CREATE TABLE `appointments` (
   KEY `vet_id` (`vet_id`),
   CONSTRAINT `appointments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `appointments_ibfk_2` FOREIGN KEY (`vet_id`) REFERENCES `veterinarians` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,6 +90,7 @@ CREATE TABLE `appointments` (
 
 LOCK TABLES `appointments` WRITE;
 /*!40000 ALTER TABLE `appointments` DISABLE KEYS */;
+INSERT INTO `appointments` VALUES (23,NULL,NULL,'Nguyễn Văn C','nguyenquanganh07042004@gmail.com','0942343223','Mèo',0,11,0,2,300000.00,'PENDING','nhanh',NULL,'2025-12-02 10:18:02','2025-12-02 10:18:02','2025-12-03 14:30:00.000000','2025-12-03 14:00:00.000000'),(25,NULL,NULL,'đasadsad','nguyenquanganh07042004@gmail.com','0964564563','323',1,3232,0,2,300000.00,'PENDING','đasa',NULL,'2025-12-02 10:25:08','2025-12-02 10:25:08','2025-12-03 15:00:00.000000','2025-12-03 14:30:00.000000');
 /*!40000 ALTER TABLE `appointments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -211,7 +212,7 @@ CREATE TABLE `examination` (
 
 LOCK TABLES `examination` WRITE;
 /*!40000 ALTER TABLE `examination` DISABLE KEYS */;
-INSERT INTO `examination` VALUES (5,'Tiêm phòng vắc-xin',300000.00,'Tiêm các loại vắc-xin phòng dại, care, parvo, cúm','2025-09-01 15:00:39','2025-11-26 06:56:12',_binary '');
+INSERT INTO `examination` VALUES (1,'Khám tổng quát',300000.00,'Kiểm tra sức khỏe cơ bản, nghe tim, kiểm tra mắt, tai, răng','2025-08-27 20:57:17','2025-11-25 23:56:03',_binary ''),(2,'Chụp X-quang',200000.00,'Chẩn đoán xương, nội tạng','2025-08-27 21:50:39','2025-11-25 23:56:05',_binary '\0'),(3,'Xét nghiệm máu',150000.00,'Kiểm tra chức năng gan, thận, máu tổng quát','2025-08-27 21:51:13','2025-11-25 23:56:07',_binary '\0'),(4,'Tẩy giun sán',100000.00,'Ngừa giun sán đường ruột','2025-08-27 21:51:38','2025-11-25 23:56:09',_binary '\0'),(5,'Tiêm phòng vắc-xin',300000.00,'Tiêm các loại vắc-xin phòng dại, care, parvo, cúm','2025-09-01 08:00:39','2025-11-25 23:56:12',_binary '');
 /*!40000 ALTER TABLE `examination` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -395,6 +396,7 @@ CREATE TABLE `pet_examination` (
 
 LOCK TABLES `pet_examination` WRITE;
 /*!40000 ALTER TABLE `pet_examination` DISABLE KEYS */;
+INSERT INTO `pet_examination` VALUES (23,5),(25,1);
 /*!40000 ALTER TABLE `pet_examination` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -546,7 +548,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `phone_number` (`phone_number`),
   KEY `role_id` (`role_id`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -606,7 +608,7 @@ CREATE TABLE `veterinarians` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_i71b2hki7hnf0mqimb8u8723i` (`user_id`),
   CONSTRAINT `FKc0848sr3veps5xqnxchutpd3n` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -628,4 +630,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-02 14:31:42
+-- Dump completed on 2025-12-02 17:26:22
