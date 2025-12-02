@@ -36,7 +36,7 @@ public class Examination {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToMany(mappedBy = "examination", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "examination")
     @JsonIgnore
     private List<Appointments> appointments;
     private boolean activate = false;

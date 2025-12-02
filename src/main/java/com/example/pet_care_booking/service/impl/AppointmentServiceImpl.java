@@ -54,13 +54,14 @@ public class AppointmentServiceImpl implements AppointmentService {
             Veterinarians veterinarians = veterinarianRepository.findByUser(user);
             Page<Appointments> pages = appointmentRepository.findAppointmentsByUser(ownerName, phoneNumber, email, petName, vetName, status, veterinarians.getId(), pageable);
             return pages.map(this::getAppointment);
-        }
-        Page<Appointments> apps = (ownerName == null && phoneNumber == null &&
-                email == null && petName == null && vetName == null && status == null)
-                ? appointmentRepository.findAll(pageable)
-                : appointmentRepository.searchAppointment(ownerName, phoneNumber, email, petName, vetName, status, pageable);
+        } else {
+            Page<Appointments> apps = (ownerName == null && phoneNumber == null &&
+                    email == null && petName == null && vetName == null && status == null)
+                    ? appointmentRepository.findAll(pageable)
+                    : appointmentRepository.searchAppointment(ownerName, phoneNumber, email, petName, vetName, status, pageable);
 
-        return apps.map(this::getAppointment);
+            return apps.map(this::getAppointment);
+        }
     }
 
     @Override

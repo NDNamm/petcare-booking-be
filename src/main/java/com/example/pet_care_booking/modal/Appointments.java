@@ -83,7 +83,7 @@ public class Appointments {
     private User user;
 
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @ManyToMany()
     @JoinTable(
             name = "pet_examination",
             joinColumns = @JoinColumn(name = "appointment_id"),
