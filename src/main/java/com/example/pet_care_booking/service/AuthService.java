@@ -11,4 +11,4 @@ public interface AuthService {
    void register(UserDTO dto);
    AuthDTO refresh(HttpServletRequest request, HttpServletResponse response);
     AuthDTO getInforUser();
-}
+    void resetPassword(Long userId);}

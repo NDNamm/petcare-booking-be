@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService {
    private final RoleRepository roleRepository;
    private final PasswordEncoder passwordEncoder;
     private final VeterinarianRepository veterinarianRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
    @Override
    public Page<UserDTO> getAllUsers(String name, String email, String phoneNumber, int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
@@ -111,6 +113,34 @@ public class UserServiceImpl implements UserService {
        }
    }
 
+    @Override
+    public UserDTO editProfile(UserDTO userDTO) {
+        User user = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getEmail().equals(userDTO.getEmail())){
+            Optional<User> checkEmail = userRepository.findUserByEmail(userDTO.getEmail());
+            if(checkEmail.isPresent()){
+                throw  new AppException(ErrorCode.EMAIL_EXISTED);
+            }
+            user.setEmail(userDTO.getEmail());
+        }
+        if(!user.getPhoneNumber().equals(userDTO.getPhoneNumber())){
+            Optional<User> checkPhone = userRepository.findUserByPhoneNumber(userDTO.getPhoneNumber());
+            if(checkPhone.isPresent()){
+                throw  new AppException(ErrorCode.PHONE_EXISTED);
+            }
+
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+        }
+
+        if(userDTO.getPassword() != null && bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())){
+            if(userDTO.getNewPassword().equals(userDTO.getConfirmPassword())){
+                user.setPassword(userDTO.getNewPassword());
+            }
+        }
+        userRepository.save(user);
+        return userDTO;
+    }
 
 
 }

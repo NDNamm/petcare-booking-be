@@ -11,5 +11,5 @@ public interface UserService {
    void addUser(UserDTO userDTO);
    void updateRoleUser(Long id,UserDTO userDTO);
    void deleteUser(Long id);
-
+    UserDTO editProfile(UserDTO userDTO);
 }

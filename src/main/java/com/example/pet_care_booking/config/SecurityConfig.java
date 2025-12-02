@@ -4,6 +4,7 @@ import com.example.pet_care_booking.modal.User;
 import com.example.pet_care_booking.repository.UserRepository;
 import com.example.pet_care_booking.security.JwtAuthenticationFilter;
 import com.example.pet_care_booking.security.JwtUtils;
+import com.example.pet_care_booking.security.RestAccessDeniedHandler;
 import com.example.pet_care_booking.security.RestAuthenticationEntryPoint;
 import com.example.pet_care_booking.service.impl.CustomOidcUserService;
 import jakarta.servlet.http.Cookie;
@@ -33,6 +34,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CustomOidcUserService customOidcUserService, JwtUtils jwtUtils, UserRepository userRepository) throws Exception {
@@ -47,15 +50,15 @@ public class SecurityConfig {
                                 "/api/orderDetail/**", "/api/examination/**", "/api/vet/**")
                         .permitAll()
                         .requestMatchers("/api/cart/session/**", "/api/order/**", "/api/order/cancel/*").permitAll()
-
+                        .requestMatchers("/api/auth/reset-password/*").hasAnyRole("ADMIN")
                         // Rating GET public, nhưng POST/PUT/DELETE cần login
                         .requestMatchers(HttpMethod.GET, "/api/rating/**").permitAll()
                         .requestMatchers("/api/rating/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/vnpay/**").permitAll()
                         // Admin only - more specific rules
                         .requestMatchers("/api/admin/**", "/api/category/").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER", "DOCTOR")
-
+                        .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER", "DOCTOR", "CUSTOMER")
+                        .requestMatchers("/api/user/update-profile").hasAnyRole("ADMIN", "USER", "DOCTOR", "CUSTOMER")
                         // Any other API requests need authentication
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
@@ -78,15 +81,10 @@ public class SecurityConfig {
                             response.sendRedirect(redirectUrl);
                         }))
                 .exceptionHandling(exception -> exception
-                        .defaultAuthenticationEntryPointFor(
-                                new RestAuthenticationEntryPoint(),
-                                new AntPathRequestMatcher("/api/**")
-                        )
-                        .defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/google"),
-                                new AntPathRequestMatcher("/**")
-                        )
+                        .authenticationEntryPoint(restAuthenticationEntryPoint) // 401 cho tất cả API
+                        .accessDeniedHandler(restAccessDeniedHandler)           // 403 cho role không đủ
                 )
+
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();

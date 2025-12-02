@@ -144,4 +144,13 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .build();
     }
+
+    @Override
+    public void resetPassword(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setPassword(passwordEncoder.encode("12345678"));
+
+        userRepository.save(user);
+    }
 }

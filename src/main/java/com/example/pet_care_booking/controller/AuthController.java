@@ -61,4 +61,10 @@ public class AuthController {
     public ResponseEntity<AuthDTO> getInfoUser() {
         return ResponseEntity.ok(authService.getInforUser());
     }
+
+    @PutMapping("/reset-password/{userId}")
+    public ResponseEntity<?> resetPassword(@PathVariable Long userId){
+        authService.resetPassword(userId);
+        return ResponseEntity.ok().build();
+    }
 }
