@@ -133,10 +133,17 @@ public class UserServiceImpl implements UserService {
             user.setPhoneNumber(userDTO.getPhoneNumber());
         }
 
-        if(userDTO.getPassword() != null && bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())){
-            if(userDTO.getNewPassword().equals(userDTO.getConfirmPassword())){
-                user.setPassword(userDTO.getNewPassword());
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
+
+            if (!bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
+                throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
             }
+
+            if (!userDTO.getNewPassword().equals(userDTO.getConfirmPassword())) {
+                throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+            }
+
+            user.setPassword(bCryptPasswordEncoder.encode(userDTO.getNewPassword()));
         }
         userRepository.save(user);
         return userDTO;
