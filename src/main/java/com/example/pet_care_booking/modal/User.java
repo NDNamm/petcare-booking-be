@@ -47,6 +47,12 @@ public class User {
     @JsonIgnore
     private List<Appointments> appointments;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PasswordResetToken> passwordResetTokens;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Address> addresses;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Order> orders;
     @OneToOne(mappedBy = "user")
     @JsonIgnore
     private Veterinarians veterinarian;
