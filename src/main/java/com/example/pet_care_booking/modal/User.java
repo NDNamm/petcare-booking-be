@@ -46,7 +46,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Appointments> appointments;
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<ProductReview> productReviews;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PasswordResetToken> passwordResetTokens;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
