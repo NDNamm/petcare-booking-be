@@ -29,5 +29,8 @@ public interface AppointmentService {
 
     List<VeterinariansDTO> checkFreeTime(LocalDateTime start);
 
+    void cancelAppointment(Long id);
+
+    List<AppointmentsDTO> getAppointmentByPhone(String phone);
 
 }

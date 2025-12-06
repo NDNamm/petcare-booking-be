@@ -163,4 +163,9 @@ public class AppointmentsController {
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start) {
         return ResponseEntity.ok(appointmentService.checkFreeTime(start));
     }
+
+    @GetMapping("/check-phone")
+    public ResponseEntity<List<AppointmentsDTO>> checkPhone(@RequestParam(required = true) String phone) {
+        return ResponseEntity.ok(appointmentService.getAppointmentByPhone(phone));
+    }
 }

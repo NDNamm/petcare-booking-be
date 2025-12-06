@@ -2,6 +2,7 @@ package com.example.pet_care_booking.repository;
 
 import com.example.pet_care_booking.modal.Appointments;
 import com.example.pet_care_booking.modal.User;
+import com.example.pet_care_booking.modal.enums.AppointStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -53,11 +54,12 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
                                                      Pageable pageable);
 
     @Query("SELECT a FROM Appointments a " +
-            "WHERE a.startTime < :end AND a.endTime > :start "
-    )
-    List<Appointments> findConflictingAppointments(
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end);
+            "WHERE a.startTime < :end AND a.endTime > :start " +
+            "AND a.appointStatus <> :status")
+    List<Appointments> findAppointments(@Param("start") LocalDateTime start,
+                                        @Param("end") LocalDateTime end,
+                                        @Param("status") AppointStatus status);
+
 
     @Query("SELECT a FROM Appointments a " +
             " JOIN a.veterinarian v " +
@@ -82,5 +84,7 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
 
 
     Long user(User user);
+
+    List<Appointments> findAppointmentsByPhoneNumber(String phone);
 }
 

@@ -502,7 +502,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<VeterinariansDTO> checkFreeTime(LocalDateTime start) {
         LocalDateTime end = start.plusMinutes(30);
-        List<Appointments> busyAppointments = appointmentRepository.findConflictingAppointments(start, end);
+        List<Appointments> busyAppointments = appointmentRepository.findAppointments(start, end, AppointStatus.CANCELLED);
         List<Veterinarians> allVets = veterinarianRepository.findAll();
 
         Set<Long> busyVetIds = busyAppointments.stream().map(it -> it.getVeterinarian().getId()).collect(Collectors.toSet());
@@ -514,6 +514,39 @@ public class AppointmentServiceImpl implements AppointmentService {
                         .build())
                 .toList();
 
+    }
+
+    @Override
+    public void cancelAppointment(Long id) {
+        Appointments appointments = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+
+        appointments.setAppointStatus(AppointStatus.CANCELLED);
+        appointmentRepository.save(appointments);
+    }
+
+    @Override
+    public List<AppointmentsDTO> getAppointmentByPhone(String phone) {
+        List<Appointments> appointments = appointmentRepository.findAppointmentsByPhoneNumber(phone);
+        List<AppointmentsDTO> appointmentsDTO = new ArrayList<>();
+        for (Appointments appointments1 : appointments) {
+            AppointmentsDTO dto = new AppointmentsDTO();
+            dto.setId(appointments1.getId());
+            dto.setNote(appointments1.getNote());
+            dto.setOwnerName(appointments1.getOwnerName());
+            dto.setEmail(appointments1.getEmail());
+            dto.setPhoneNumber(appointments1.getPhoneNumber());
+            dto.setStart(appointments1.getStartTime());
+            dto.setEnd(appointments1.getEndTime());
+            dto.setAge(appointments1.getAge());
+            dto.setPetGender(appointments1.getPetGender());
+            dto.setExamination(getExamination(appointments1));
+            dto.setTotalPrice(appointments1.getTotalPrice());
+            dto.setAppointStatus(appointments1.getAppointStatus());
+            dto.setVeterinarian(appointments1.getVeterinarian());
+            appointmentsDTO.add(dto);
+        }
+        return appointmentsDTO;
     }
 
 

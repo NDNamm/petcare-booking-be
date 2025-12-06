@@ -4,8 +4,10 @@ import com.example.pet_care_booking.modal.Veterinarians;
 import com.example.pet_care_booking.modal.enums.PetGender;
 import com.example.pet_care_booking.modal.enums.PetType;
 import com.example.pet_care_booking.modal.enums.AppointStatus;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -15,6 +17,8 @@ import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AppointmentsDTO {
    private Long id;
    private String ownerName;
