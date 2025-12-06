@@ -57,6 +57,7 @@ public class Order {
     private Payments payment;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Address address;
 
 }

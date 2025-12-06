@@ -40,5 +40,6 @@ public class Address {
 
    @OneToOne
    @JoinColumn(name = "order_id")
+   @JsonIgnore
    private Order order;
 }
