@@ -68,6 +68,7 @@ public class ExaminationServiceImpl implements ExaminationService {
                 .price(examinationDTO.getPrice())
                 .description(examinationDTO.getDescription())
                 .createdAt(LocalDateTime.now())
+                .activate(examinationDTO.isActive())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
@@ -86,11 +87,12 @@ public class ExaminationServiceImpl implements ExaminationService {
         examination.setPrice(examinationDTO.getPrice());
         examination.setDescription(examinationDTO.getDescription());
         examination.setUpdatedAt(LocalDateTime.now());
+        examination.setActivate(examinationDTO.isActive());
         examinationRepository.save(examination);
 
         return getExamination(examination);
     }
-
+    
     @Override
     public void deleteExamination(Long id) {
         Examination examination = examinationRepository.findById(id)
