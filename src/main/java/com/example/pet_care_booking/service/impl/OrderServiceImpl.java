@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -97,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrder(OrderDTO orderDTO, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-
+        checkStatus(order.getStatus(), orderDTO.getStatus());
         order.setStatus(orderDTO.getStatus());
         if (orderDTO.getStatus().equals(OrderStatus.COMPLETED)) {
             List<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId);
@@ -117,6 +118,62 @@ public class OrderServiceImpl implements OrderService {
         }
         orderRepository.save(order);
     }
+
+    private void checkStatus(OrderStatus current, OrderStatus next) {
+
+        if (current == OrderStatus.PENDING
+                && next != OrderStatus.CONFIRMED
+                && next != OrderStatus.CANCELED) {
+
+            throw new RuntimeException(
+                    "Đơn hàng đang ở trạng thái CHỜ XÁC NHẬN. " +
+                            "Trạng thái tiếp theo hợp lệ phải là: ĐÃ XÁC NHẬN hoặc ĐÃ HỦY."
+            );
+        }
+
+        if (current == OrderStatus.CONFIRMED
+                && next != OrderStatus.SHIPPING
+                && next != OrderStatus.CANCELED) {
+
+            throw new RuntimeException(
+                    "Đơn hàng đang ở trạng thái ĐÃ XÁC NHẬN. " +
+                            "Trạng thái tiếp theo hợp lệ phải là: ĐANG GIAO hoặc ĐÃ HỦY."
+            );
+        }
+
+        if (current == OrderStatus.SHIPPING
+                && next != OrderStatus.COMPLETED
+                && next != OrderStatus.NOT_RECEIVED) {
+
+            throw new RuntimeException(
+                    "Đơn hàng đang ở trạng thái ĐANG GIAO. " +
+                            "Trạng thái tiếp theo hợp lệ phải là: HOÀN THÀNH hoặc KHÔNG NHẬN HÀNG."
+            );
+        }
+
+        if (current == OrderStatus.NOT_RECEIVED
+                && next != OrderStatus.SHIPPING
+                && next != OrderStatus.CANCELED) {
+
+            throw new RuntimeException(
+                    "Đơn hàng KHÔNG NHẬN HÀNG. " +
+                            "Bạn chỉ có thể chuyển lại về: ĐANG GIAO hoặc ĐÃ HỦY."
+            );
+        }
+
+        if (current == OrderStatus.CANCELED) {
+            throw new RuntimeException(
+                    "Đơn hàng đã bị HỦY nên không thể thay đổi trạng thái thêm."
+            );
+        }
+
+        if (current == OrderStatus.COMPLETED) {
+            throw new RuntimeException(
+                    "Đơn hàng đã HOÀN THÀNH nên không thể thay đổi trạng thái thêm."
+            );
+        }
+    }
+
 
     @Override
     public void deleteOrder(Long orderId) {

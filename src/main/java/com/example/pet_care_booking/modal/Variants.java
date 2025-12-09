@@ -33,6 +33,8 @@ public class Variants {
     @OneToMany(mappedBy = "variant")
     private List<CartItem> cartItems;
 
+    @OneToMany(mappedBy = "variant", cascade = CascadeType.REMOVE)
+    private List<OrderDetail> orderDetails;
 
 
 }

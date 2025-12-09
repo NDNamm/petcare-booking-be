@@ -42,6 +42,14 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final UserRepository userRepository;
     private final VeterinarianRepository veterinarianRepository;
     private final ExaminationRepository examinationRepository;
+    private Map<AppointStatus, List<AppointStatus>> VALID_NOW = Map.of(
+            AppointStatus.PENDING, List.of(AppointStatus.CONFIRMED, AppointStatus.CANCELLED),
+            AppointStatus.CONFIRMED, List.of(AppointStatus.IN_QUEUE, AppointStatus.CANCELLED),
+            AppointStatus.IN_QUEUE, List.of(AppointStatus.IN_PROGRESS, AppointStatus.CANCELLED),
+            AppointStatus.IN_PROGRESS, List.of(AppointStatus.COMPLETED, AppointStatus.CANCELLED),
+            AppointStatus.COMPLETED, List.of(),
+            AppointStatus.CANCELLED, List.of()
+    );
 
     @Override
     public Page<AppointmentsDTO> getAppointments(String ownerName, String phoneNumber, String email,
@@ -80,6 +88,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void updateAppointment(Long id, AppointmentsDTO appointmentsDTO) {
         Appointments app = appointmentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.APPOINTMENT_NOT_FOUND));
+        checkStatusAppointment(app.getAppointStatus(), appointmentsDTO.getAppointStatus());
         app.setAppointStatus(appointmentsDTO.getAppointStatus());
         app.setUpdatedAt(LocalDateTime.now());
         appointmentRepository.save(app);
@@ -191,6 +200,37 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.save(app);
         return getAppointment(app);
     }
+
+    private void checkStatusAppointment(AppointStatus current, AppointStatus next) {
+
+        if (current == AppointStatus.PENDING
+                && next != AppointStatus.CONFIRMED
+                && next != AppointStatus.CANCELLED) {
+
+            throw new RuntimeException("Vui lòng XÁC NHẬN lịch hẹn trước khi thực hiện.");
+        }
+
+        if (current == AppointStatus.CONFIRMED
+                && next != AppointStatus.IN_QUEUE
+                && next != AppointStatus.CANCELLED) {
+
+            throw new RuntimeException("Sau trạng thái ĐÃ XÁC NHẬN, trạng thái tiếp theo phải là ĐANG CHỜ hoặc ĐÃ HỦY.");
+        }
+
+        if (current == AppointStatus.IN_QUEUE
+                && next != AppointStatus.IN_PROGRESS) {
+
+            throw new RuntimeException("Sau trạng thái ĐANG CHỜ, trạng thái tiếp theo phải là ĐANG KHÁM.");
+        }
+
+        if (current == AppointStatus.IN_PROGRESS
+                && next != AppointStatus.COMPLETED) {
+
+            throw new RuntimeException("Sau trạng thái ĐANG KHÁM, trạng thái tiếp theo phải là HOÀN THÀNH.");
+        }
+    }
+
+
 
     @Override
     @Transactional

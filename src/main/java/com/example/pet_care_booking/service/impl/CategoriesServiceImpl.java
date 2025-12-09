@@ -42,7 +42,7 @@ public class CategoriesServiceImpl implements CategoriesService {
    public CategoriesDTO addCate(CategoriesDTO categoriesDTO, MultipartFile image) {
       boolean categories = categoriesRepository.existsByNameCate(categoriesDTO.getNameCate());
       if (categories) {
-         throw new AppException(ErrorCode.CATEGORY_NAME_EXISTED);
+         throw new RuntimeException("Category already exists");
       }
       try {
          Categories category = Categories.builder()
