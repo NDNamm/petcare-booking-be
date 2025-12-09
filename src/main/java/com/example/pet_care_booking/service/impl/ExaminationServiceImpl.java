@@ -82,7 +82,12 @@ public class ExaminationServiceImpl implements ExaminationService {
 
         Examination examination = examinationRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.EXAMINATION_NOT_FOUND));
-
+        if(!examinationDTO.getName().equals(examination.getName())) {
+            boolean exist = examinationRepository.existsByName(examinationDTO.getName());
+            if(exist) {
+                throw new AppException(ErrorCode.EXAMINATION_NAME_EXISTED);
+            }
+        }
         examination.setName(examinationDTO.getName());
         examination.setPrice(examinationDTO.getPrice());
         examination.setDescription(examinationDTO.getDescription());
