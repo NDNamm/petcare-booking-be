@@ -228,6 +228,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
             throw new RuntimeException("Sau trạng thái ĐANG KHÁM, trạng thái tiếp theo phải là HOÀN THÀNH.");
         }
+
+        if (current == AppointStatus.COMPLETED) {
+            throw new RuntimeException("Lịch hẹn đã HOÀN THÀNH, không thể thay đổi trạng thái tiếp theo.");
+        }
     }
 
 
