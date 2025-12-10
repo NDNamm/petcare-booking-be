@@ -17,7 +17,7 @@ public class JwtUtils {
 
     @Value("${jwt.secret}")
     private String secretKey;
-    private static final long EXPIRATION_TIME_ACCESS = 24 * 60 * 60 * 1000;
+    private static final long EXPIRATION_TIME_ACCESS = 15 * 60 * 1000;
     private static final long EXPIRATION_TIME_REFRESH = 7 * 24 * 60 * 60 * 1000;
     private Key key;
 
@@ -29,7 +29,6 @@ public class JwtUtils {
     public String createAccessToken(String userName, String role) {
         return Jwts.builder()
                 .setSubject(userName)
-                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_ACCESS))
                 .signWith(key, SignatureAlgorithm.HS256)

@@ -70,7 +70,7 @@ public class SecurityConfig {
                             User user = userRepository.findUserByEmail(email)
                                     .orElseThrow(() -> new IllegalArgumentException("Not found user"));
                             String token = jwtUtils.createAccessToken(user.getUserName(), user.getRole().getName());
-                            String refreshToken = UUID.randomUUID().toString();
+                            String refreshToken = jwtUtils.createRefreshToken(user.getUserName());
                             Cookie cookie = new Cookie("refresh_token", refreshToken);
                             cookie.setHttpOnly(true);
                             cookie.setPath("/");

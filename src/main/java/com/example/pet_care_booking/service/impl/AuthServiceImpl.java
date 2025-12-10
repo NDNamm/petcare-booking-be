@@ -14,6 +14,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -42,9 +44,10 @@ public class AuthServiceImpl implements AuthService {
             Cookie cookie = new Cookie("refresh_token", refreshToken);
             cookie.setHttpOnly(true);
             cookie.setPath("/");
-            cookie.setSecure(true);
+            cookie.setSecure(false);
             cookie.setMaxAge(7 * 24 * 60 * 60);
             response.addCookie(cookie);
+            log.info("refresh_token {}" , refreshToken);
             return getAuth(user, accessToken);
         } else {
             throw new UsernameNotFoundException("The username or password is incorrect");
