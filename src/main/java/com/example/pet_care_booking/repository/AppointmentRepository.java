@@ -84,7 +84,7 @@ public interface AppointmentRepository extends JpaRepository<Appointments, Long>
 
 
     Long user(User user);
-
+    @Query("SELECT a FROM Appointments a WHERE a.phoneNumber = :phone ORDER BY a.id DESC ")
     List<Appointments> findAppointmentsByPhoneNumber(String phone);
 }
 
