@@ -28,7 +28,8 @@ public class Product {
    private String slug;
    @Column(name = "name", nullable = false, unique = true)
    private String namePro;
-
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductReview>  productReviews;
 //   @Column(name = "price", precision = 10, scale = 2)
 //   private BigDecimal price;
 //
