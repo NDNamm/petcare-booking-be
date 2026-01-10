@@ -69,7 +69,7 @@ public class ImagesServiceImpl implements ImageService {
       List<Images> oldImages = product.getImages();
       if (oldImages != null && !oldImages.isEmpty()) {
          for (Images image : oldImages) {
-            cloudinary.uploader().destroy(image.getPublicId(), ObjectUtils.emptyMap());
+//            cloudinary.uploader().destroy(image.getPublicId(), ObjectUtils.emptyMap());
             imagesRepository.delete(image);
          }
       }
