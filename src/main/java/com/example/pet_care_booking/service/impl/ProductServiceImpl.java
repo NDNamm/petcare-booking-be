@@ -113,8 +113,11 @@ public class ProductServiceImpl implements ProductService {
                 });
 
         try {
+            Categories category = categoriesRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
             product.setNamePro(dto.getNamePro());
 //            product.setPrice(dto.getPrice());
+            product.setCategory(category);
             product.setDescription(dto.getDescription());
             product.setUpdatedAt(LocalDateTime.now());
 //            product.setSl(dto.getSl());
