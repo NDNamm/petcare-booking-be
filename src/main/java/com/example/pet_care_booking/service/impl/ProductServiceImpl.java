@@ -78,6 +78,7 @@ public class ProductServiceImpl implements ProductService {
                     .status(ProductStatus.AVAILABLE)
 //                    .sl(dto.getSl())
                     .slug(convertSlug)
+
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .category(categories)
@@ -259,6 +260,7 @@ public class ProductServiceImpl implements ProductService {
                     .id(item.getId())
                     .productId(item.getProduct().getId())
                     .size(item.getSize())
+
                     .price(item.getPrice())
                     .stock(item.getStock())
                     .build();
@@ -275,6 +277,7 @@ public class ProductServiceImpl implements ProductService {
                 .imageUrl(product.getImageUrl())
 //                .price(product.getPrice())
 //                .sl(product.getSl())
+                .categoryId(product.getCategory().getId())
                 .averageRating(averageRating)
                 .variants(variants)
                 .categoryName(product.getCategory().getNameCate())

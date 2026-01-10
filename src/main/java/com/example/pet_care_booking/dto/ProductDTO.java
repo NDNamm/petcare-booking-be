@@ -20,6 +20,8 @@ public class ProductDTO {
     @Size(min = 2, message = "PRODUCT_NAME_INVALID")
     private String namePro;
     private String slug;
+    private boolean active;
+    @NotBlank(message = "PRODUCT_DESCRIPTION_INVALID")
     private String imageUrl;
     @NotBlank(message = "PRODUCT_PRICE_INVALID")
     private BigDecimal price;
